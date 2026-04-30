@@ -69,6 +69,7 @@ export default function App() {
   })
   const [result, setResult] = useState<TimelineResult | null>(null)
   const [activeTab, setActiveTab] = useState<TabKey>('calculator')
+  const [selectedProfCategory, setSelectedProfCategory] = useState<string | null>(null)
 
   useEffect(() => {
     const shared = parseShareUrl()
@@ -113,6 +114,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function handleNavigateToProfessional(category: string) {
+    setSelectedProfCategory(category)
+    setActiveTab('szakemberek')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--page-bg)' }}>
       <StickyHeader
@@ -141,7 +148,7 @@ export default function App() {
 
             {result !== null && (
               <>
-                <TimelineGantt result={result} statusKey={form.statusKey} />
+                <TimelineGantt result={result} statusKey={form.statusKey} onNavigateToProfessional={handleNavigateToProfessional} />
                 <MultiplierPanel result={result} />
                 <InsightsPanel result={result} />
                 <RealityCheckPanel result={result} />
@@ -164,7 +171,12 @@ export default function App() {
         {activeTab === 'cikkek' && <Cikkek />}
 
         {/* ── Szakemberek ── */}
-        {activeTab === 'szakemberek' && <Szakemberek />}
+        {activeTab === 'szakemberek' && (
+          <Szakemberek
+            initialCategory={selectedProfCategory}
+            onCategoryConsumed={() => setSelectedProfCategory(null)}
+          />
+        )}
 
         {/* ── Pro terv — shows empty state or scrolls to pro content ── */}
         {activeTab === 'pro' && (

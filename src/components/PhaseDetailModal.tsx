@@ -157,9 +157,10 @@ export const PHASE_MODAL_DATA: Record<string, PhaseModalData> = {
 interface Props {
   phaseName: string
   onClose: () => void
+  onNavigateToProfessional?: (category: string) => void
 }
 
-export default function PhaseDetailModal({ phaseName, onClose }: Props) {
+export default function PhaseDetailModal({ phaseName, onClose, onNavigateToProfessional }: Props) {
   const data = PHASE_MODAL_DATA[phaseName]
 
   useEffect(() => {
@@ -209,7 +210,16 @@ export default function PhaseDetailModal({ phaseName, onClose }: Props) {
                   <BulletList items={data.prerequisites} />
                 </Section>
                 <Section title="Szükséges szakemberek" icon="👷" color="#3B82F6">
-                  <TagList items={data.professionals} color="#3B82F6" bg="#EFF6FF" border="#93C5FD" />
+                  <TagList
+                    items={data.professionals}
+                    color="#3B82F6" bg="#EFF6FF" border="#93C5FD"
+                    onClickItem={onNavigateToProfessional}
+                  />
+                  {onNavigateToProfessional && (
+                    <p className="text-[10px] mt-2" style={{ color: '#93C5FD' }}>
+                      👆 Kattints a kategóriára a szakemberekért
+                    </p>
+                  )}
                 </Section>
                 <Section title="Mi következik?" icon="➡️" color="#8B5CF6">
                   <BulletList items={data.whatFollows} />
@@ -292,12 +302,26 @@ function BulletList({ items, dot = 'var(--tx-muted)' }: { items: string[]; dot?:
   )
 }
 
-function TagList({ items, color, bg, border }: { items: string[]; color: string; bg: string; border: string }) {
+function TagList({ items, color, bg, border, onClickItem }: {
+  items: string[]; color: string; bg: string; border: string
+  onClickItem?: (item: string) => void
+}) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {items.map(item => (
-        <span key={item} className="text-[11px] font-medium rounded-lg px-2.5 py-1 border"
-          style={{ background: bg, borderColor: border, color }}>{item}</span>
+        <span key={item}
+          className="text-[11px] font-medium rounded-lg px-2.5 py-1 border transition-all"
+          style={{
+            background: bg, borderColor: border, color,
+            cursor: onClickItem ? 'pointer' : 'default',
+            boxShadow: onClickItem ? undefined : 'none',
+          }}
+          onClick={() => onClickItem?.(item)}
+          onMouseEnter={(e: React.MouseEvent<HTMLSpanElement>) => { if (onClickItem) (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)' }}
+          onMouseLeave={(e: React.MouseEvent<HTMLSpanElement>) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)' }}
+        >
+          {item}{onClickItem && ' →'}
+        </span>
       ))}
     </div>
   )

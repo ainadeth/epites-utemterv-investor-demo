@@ -7,6 +7,7 @@ import PhaseDetailModal from './PhaseDetailModal'
 interface Props {
   result: TimelineResult
   statusKey: StatusKey
+  onNavigateToProfessional?: (category: string) => void
 }
 
 const PALETTE = [
@@ -36,7 +37,7 @@ function paletteIdx(row: TimelineRow): number {
   return row.kind === 'phase' ? (row.num - 1) : (row.phaseNum - 1)
 }
 
-export default function TimelineGantt({ result, statusKey }: Props) {
+export default function TimelineGantt({ result, statusKey, onNavigateToProfessional }: Props) {
   const { rows, totalDays, projectStart } = result
   const [sliderDay,    setSliderDay]    = useState(0)
   const [hoveredKey,   setHoveredKey]   = useState<string | null>(null)
@@ -283,7 +284,14 @@ export default function TimelineGantt({ result, statusKey }: Props) {
 
     {/* Phase detail modal */}
     {selectedPhase && (
-      <PhaseDetailModal phaseName={selectedPhase} onClose={() => setSelectedPhase(null)} />
+      <PhaseDetailModal
+        phaseName={selectedPhase}
+        onClose={() => setSelectedPhase(null)}
+        onNavigateToProfessional={onNavigateToProfessional ? (cat) => {
+          setSelectedPhase(null)
+          onNavigateToProfessional(cat)
+        } : undefined}
+      />
     )}
     </>
   )

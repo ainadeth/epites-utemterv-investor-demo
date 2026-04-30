@@ -167,6 +167,27 @@ export default function StrategicSection() {
           </ul>
         </div>
 
+        {/* ── Technical roadmap card ── */}
+        <div className="card p-6 mb-6 border-l-4" style={{ borderLeftColor: '#3B82F6' }}>
+          <div className="flex items-center gap-2.5 mb-3">
+            <span className="text-lg">🛠️</span>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Következő technikai lépés: valódi lead mentés</p>
+              <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>Roadmap — még nem implementált</p>
+            </div>
+          </div>
+          <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--tx-secondary)' }}>
+            A PDF export élesítéséhez backend vagy serverless funkció, e-mail szolgáltató, adatbázis és adatkezelési oldal szükséges. Ezzel a kalkulátor valódi leadgeneráló eszközzé válhat.
+          </p>
+          <ul className="flex flex-col gap-1.5">
+            {['PDF generálás', 'e-mail küldés', 'lead mentés', 'adatkezelési checkbox és privacy oldal', 'CRM / Google Sheets / Airtable / Supabase integráció'].map(item => (
+              <li key={item} className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--tx-secondary)' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />{item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* ── Early access strip ── */}
         <div
           className="rounded-3xl overflow-hidden"

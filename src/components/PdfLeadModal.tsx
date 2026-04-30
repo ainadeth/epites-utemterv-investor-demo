@@ -86,7 +86,7 @@ export default function PdfLeadModal({ onClose }: Props) {
               </div>
               <div className="w-full rounded-2xl p-4 border text-left" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
                 <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-                  ℹ️ Ez jelenleg demó előregisztrációs funkció. Az adatok mentése később backend bekötéssel történik.
+                  ℹ️ A demóban az adatok még nem kerülnek mentésre. Éles verzióban a PDF-generálás, e-mail küldés és adatmentés backend bekötéssel működik majd.
                 </p>
               </div>
               <button onClick={onClose}
