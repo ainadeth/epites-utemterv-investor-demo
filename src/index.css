@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+:root {
+  --surface:          #ffffff;
+  --surface-raised:   #ffffff;
+  --surface-subtle:   #F8F7F4;
+  --page-bg:          #F2F0EC;
+  --border:           #E8E6E1;
+  --border-strong:    #D1CEC8;
+  --tx-primary:       #111827;
+  --tx-secondary:     #4B5563;
+  --tx-muted:         #9CA3AF;
+  --blue:             #2563EB;
+  --blue-hover:       #1D4ED8;
+  --shadow-card:      0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.05);
+  --shadow-card-hover:0 4px 8px rgba(0,0,0,.08), 0 12px 32px rgba(0,0,0,.08);
+  --shadow-header:    0 1px 0 rgba(0,0,0,.06), 0 4px 24px rgba(0,0,0,.06);
+}
+
+.dark {
+  --surface:          #1C1C1E;
+  --surface-raised:   #242426;
+  --surface-subtle:   #2C2C2E;
+  --page-bg:          #111113;
+  --border:           rgba(255,255,255,.08);
+  --border-strong:    rgba(255,255,255,.14);
+  --tx-primary:       #F4F4F5;
+  --tx-secondary:     #A1A1AA;
+  --tx-muted:         #71717A;
+  --shadow-card:      0 1px 3px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+  --shadow-card-hover:0 4px 8px rgba(0,0,0,.5), 0 12px 32px rgba(0,0,0,.4);
+  --shadow-header:    0 1px 0 rgba(255,255,255,.05), 0 4px 24px rgba(0,0,0,.4);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--page-bg);
+    color: var(--tx-primary);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  * { transition: border-color 0.2s ease, background-color 0.2s ease; }
+  /* Don't animate transforms globally — breaks animations */
+  *:not([class*="animate-"]):not([class*="transition-"]) {
+    transition-property: color, background-color, border-color, fill, stroke, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+  }
+}
+
+/* ── Range slider ───────────────────────────────────────────────────────── */
+@layer utilities {
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 9999px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1.5px var(--blue), 0 2px 8px rgba(37,99,235,.35);
+    cursor: pointer;
+    transition: box-shadow .15s, transform .1s;
+  }
+  input[type='range']::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 3px rgba(37,99,235,.25), 0 2px 8px rgba(37,99,235,.4);
+    transform: scale(1.1);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 8px rgba(37,99,235,.35);
+    cursor: pointer;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .card:hover { box-shadow: var(--shadow-card-hover); }
+
+  /* ── Input / Select ── */
+  .field-input {
+    width: 100%;
+    background: var(--surface-subtle);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-size: 14px;
+    color: var(--tx-primary);
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  }
+
+  /* ── Phase bar active glow ── */
+  .phase-bar-active {
+    box-shadow: 0 2px 12px rgba(37,99,235,.35), 0 0 0 1px rgba(37,99,235,.3);
+  }
+}
