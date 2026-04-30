@@ -31,7 +31,7 @@ interface Props {
   onTabChange: (tab: TabKey) => void
 }
 
-export default function StickyHeader({ form, onLoadProject, activeTab, onTabChange }: Props) {
+export default function StickyHeader({ form, result, onLoadProject, activeTab, onTabChange }: Props) {
   const { isDark, toggle } = useTheme()
   const [scrolled,      setScrolled]      = useState(false)
   const [mobileMenuOpen, setMobileMenu]   = useState(false)
@@ -291,7 +291,7 @@ export default function StickyHeader({ form, onLoadProject, activeTab, onTabChan
       </div>
 
       {/* ── PDF lead capture modal ── */}
-      {pdfModalOpen && <PdfLeadModal onClose={() => setPdfModal(false)} />}
+      {pdfModalOpen && <PdfLeadModal onClose={() => setPdfModal(false)} result={result} form={form} />}
     </>
   )
 }

@@ -41,7 +41,7 @@ const RELIABILITY_CONFIG = {
 export default function BudgetSection({ form }: Props) {
   const [budgetInput, setBudgetInput] = useState('')
 
-  const estimate = calcBudget(form.sizeM2, form.qualityKey, form.executionModeKey, form.complexityKey)
+  const estimate = calcBudget(form.sizeM2, form.qualityKey, form.executionModeKey, form.complexityKey, form.projectKey)
 
   const availableParsed = parseInt(budgetInput.replace(/\s/g, ''), 10)
   const hasAvailable    = !isNaN(availableParsed) && availableParsed > 0
@@ -103,9 +103,14 @@ export default function BudgetSection({ form }: Props) {
 
       {/* ── Phase cost distribution ── */}
       <div className="mb-6">
-        <p className="text-[11px] font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--tx-muted)' }}>
-          Fázisonkénti megoszlás (becsült)
-        </p>
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--tx-muted)' }}>
+              Fázisonkénti megoszlás (becsült)
+            </p>
+            <p className="text-[10px]" style={{ color: 'var(--tx-muted)' }}>
+              A költségbontás a kiválasztott projekttípushoz igazodik.
+            </p>
+          </div>
         <PhaseDistributionTable estimate={estimate} />
       </div>
 

@@ -137,27 +137,47 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
             return (
               <div key={profile.id} className="card p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>{profile.name}</p>
-                    <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>{profile.category} · {profile.location}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--tx-primary)' }}>{profile.name}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--tx-muted)' }}>{profile.category} · {profile.location}</p>
                   </div>
                   <span className="shrink-0 text-[10px] font-semibold rounded-full px-2.5 py-1 border whitespace-nowrap"
                     style={{ background: bStyle.bg, borderColor: bStyle.border, color: bStyle.color }}>
                     {profile.badge}
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-secondary)' }}>{profile.reference}</p>
-                <div className="flex items-center justify-between mt-auto pt-2 border-t" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-amber-400 text-sm">★</span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--tx-primary)' }}>{profile.rating.toFixed(1)}</span>
+                  <span className="text-xs" style={{ color: 'var(--tx-muted)' }}>· {profile.reviews} értékelés</span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-secondary)' }}>{profile.intro}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {profile.specialties.map((s: string) => (
+                    <span key={s} className="text-[10px] rounded-lg px-2 py-0.5 border"
+                      style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)', color: 'var(--tx-muted)' }}>
+                      {s}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[11px] italic" style={{ color: 'var(--tx-muted)' }}>{profile.reference}</p>
+                <div className="flex items-center justify-between mt-auto pt-3 border-t gap-2 flex-wrap" style={{ borderColor: 'var(--border)' }}>
                   <span className="text-[10px] font-medium rounded-full px-2 py-0.5"
                     style={{ background: 'var(--surface-subtle)', color: 'var(--tx-muted)' }}>
                     {profile.availability}
                   </span>
-                  <button type="button"
-                    onClick={() => openAs('szakagi')}
-                    className="text-xs font-semibold rounded-xl px-3 py-1.5 border transition-all hover:scale-[1.02]"
-                    style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface-subtle)' }}>
-                    Kapcsolatfelvétel előnézet
-                  </button>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => openAs('szakagi')}
+                      className="text-[11px] font-medium rounded-xl px-2.5 py-1.5 border transition-all hover:scale-[1.02]"
+                      style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface-subtle)' }}>
+                      Ajánlatkérés előnézet
+                    </button>
+                    <button type="button" onClick={() => openAs('szakagi')}
+                      className="text-[11px] font-semibold rounded-xl px-2.5 py-1.5 border transition-all hover:scale-[1.02]"
+                      style={{ borderColor: '#93C5FD', background: '#EFF6FF', color: '#1D4ED8' }}>
+                      Profil megtekintése
+                    </button>
+                  </div>
                 </div>
               </div>
             )
@@ -166,7 +186,7 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
       ) : (
         <div className="card p-8 text-center mb-6">
           <p className="text-sm" style={{ color: 'var(--tx-muted)' }}>
-            Ehhez a kategóriához és lokációhoz még nincs minta profil.
+            Ebben a kategóriában még nincs demó profil, de később validált szakemberek jelenhetnek meg.
           </p>
         </div>
       )}
@@ -174,7 +194,7 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
       {/* Disclaimer */}
       <div className="rounded-2xl p-4 border mb-8" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
         <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-          ℹ️ A szakemberprofilok jelenleg demó adatok. A későbbi cél az előszűrt, validált szakemberek listázása referenciák, jogosultságok és működési terület alapján.
+          ℹ️ A profilok fiktív demó adatok, nem valós szakemberajánlások. Az éles rendszer célja előszűrt, validált szakemberek listázása lesz referenciák, jogosultságok és működési terület alapján.
         </p>
       </div>
 
