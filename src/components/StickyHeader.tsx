@@ -11,7 +11,7 @@ import AccountModal from './AccountModal'
 
 // ── Tabs ────────────────────────────────────────────────────────────────────
 
-export type TabKey = 'calculator' | 'fazis' | 'cikkek' | 'szakemberek' | 'anyagok' | 'pro' | 'vizió'
+export type TabKey = 'calculator' | 'fazis' | 'cikkek' | 'szakemberek' | 'anyagok' | 'pro' | 'projektek' | 'vizió'
 
 const PRIMARY_TABS: { key: TabKey; label: string }[] = [
   { key: 'calculator',  label: 'Kalkulátor'    },
@@ -19,6 +19,7 @@ const PRIMARY_TABS: { key: TabKey; label: string }[] = [
   { key: 'anyagok',     label: 'Anyagok'       },
   { key: 'szakemberek', label: 'Szakemberek'   },
   { key: 'cikkek',      label: 'Cikkek'        },
+  { key: 'projektek',   label: 'Projektjeim'   },
   { key: 'pro',         label: 'Pro terv'      },
 ]
 
@@ -30,7 +31,7 @@ const ALL_TABS = [...PRIMARY_TABS, ...SECONDARY_TABS]
 
 const TAB_ICONS: Record<TabKey, string> = {
   calculator: '🏗️', fazis: '🔧', cikkek: '📖',
-  szakemberek: '👷', anyagok: '🧱', pro: '✦', vizió: '🚀',
+  szakemberek: '👷', anyagok: '🧱', pro: '✦', projektek: '📂', vizió: '🚀',
 }
 
 // ── Props ───────────────────────────────────────────────────────────────────

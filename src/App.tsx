@@ -17,6 +17,7 @@ import FazisKalkulatorok from './components/FazisKalkulatorok'
 import Cikkek from './components/Cikkek'
 import Szakemberek from './components/Szakemberek'
 import AnyagokSection from './components/AnyagokSection'
+import ProjektekSection from './components/ProjektekSection'
 import CTASection from './components/CTASection'
 import StrategicSection from './components/StrategicSection'
 import ScalabilitySection from './components/ScalabilitySection'
@@ -183,6 +184,9 @@ export default function App() {
         {activeTab === 'anyagok' && (
           <AnyagokSection projectKey={form.projectKey} />
         )}
+
+        {/* ── Projektjeim dashboard ── */}
+        {activeTab === 'projektek' && <ProjektekSection />}
 
         {/* ── Pro terv — shows empty state or scrolls to pro content ── */}
         {activeTab === 'pro' && (

@@ -104,6 +104,10 @@ export default function StrategicSection() {
             A fiókalapú működés később lehetővé teszi a mentett projekteket,
             szakember-hozzáféréseket, Pro csomagokat és projektmenedzsment irányt.
           </p>
+          <p className="text-xs leading-relaxed mt-1.5" style={{ color: 'var(--tx-muted)' }}>
+            A mentett projektek és szerepkör-alapú hozzáférések révén a Buildmap később
+            egyszeri kalkulátorból projektmenedzsment és marketplace platformmá bővíthető.
+          </p>
         </div>
 
         {/* ── 4 platform pillars ── */}
