@@ -23,6 +23,7 @@ const PRICE_COLORS: Record<string, { bg: string; border: string; color: string }
 
 export default function AnyagokSection({ projectKey }: Props) {
   const [activeCardId, setActiveCardId] = useState<string | null>(null)
+  const [activeSource, setActiveSource] = useState<string | null>(null)
   const cards = getMaterialCards(projectKey)
   const projectLabel = PROJECTS[projectKey]?.label ?? projectKey
 
@@ -98,6 +99,35 @@ export default function AnyagokSection({ projectKey }: Props) {
         </div>
       </div>
 
+      {/* ── Recommended sources block ── */}
+      <div className="card p-6 mb-6">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base shrink-0"
+            style={{ background: 'var(--sage-light)' }}>🔍</div>
+          <div>
+            <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>
+              Ajánlott beszerzési források
+            </p>
+            <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>
+              Demo előnézet — éles verzióban lokáció és projektfázis alapján
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2.5">
+          {SOURCE_TYPES.map(src => (
+            <button key={src.label} type="button"
+              onClick={() => setActiveSource(src.label)}
+              className="flex items-center gap-2 text-xs font-semibold rounded-xl px-4 py-2.5 border transition-all hover:scale-[1.02]"
+              style={{ borderColor: 'var(--border)', background: 'var(--surface-subtle)', color: 'var(--tx-secondary)' }}>
+              <span>{src.icon}</span>{src.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] mt-3" style={{ color: 'var(--tx-muted)' }}>
+          ℹ️ A linkek jelenleg demó előnézetek. Az éles verzióban valódi forrásokhoz kapcsolódnak.
+        </p>
+      </div>
+
       {/* ── Partner logic block ── */}
       <div className="card p-7 mb-6">
         <div className="flex items-center gap-2.5 mb-5">
@@ -136,6 +166,14 @@ export default function AnyagokSection({ projectKey }: Props) {
           card={cards.find(c => c.id === activeCardId)!}
           projectLabel={projectLabel}
           onClose={() => setActiveCardId(null)}
+        />
+      )}
+      {activeSource && (
+        <SourceModal
+          sourceLabel={activeSource}
+          projectLabel={projectLabel}
+          category={cards[0]?.category ?? ''}
+          onClose={() => setActiveSource(null)}
         />
       )}
     </div>
@@ -321,6 +359,136 @@ function ProcurementModal({
               className="text-sm font-semibold rounded-xl px-5 py-2.5 text-white transition-all hover:scale-[1.02]"
               style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 3px 10px rgba(74,124,89,.25)' }}
             >
+              Értesítést kérek
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Source types data ──────────────────────────────────────────────────────
+
+const SOURCE_TYPES = [
+  { icon: '🏗️', label: 'Tüzépek keresése' },
+  { icon: '🏪', label: 'Barkácsáruházak' },
+  { icon: '🏭', label: 'Gyártói oldalak' },
+  { icon: '💹', label: 'Árak összehasonlítása' },
+  { icon: '🔧', label: 'Szakkereskedések' },
+]
+
+// ── Source preview modal ───────────────────────────────────────────────────
+
+function SourceModal({
+  sourceLabel, projectLabel, category, onClose,
+}: {
+  sourceLabel: string; projectLabel: string; category: string; onClose: () => void
+}) {
+  const [lokacio, setLokacio] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', fn)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', fn); document.body.style.overflow = '' }
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
+      style={{ background: 'rgba(0,0,0,.45)', backdropFilter: 'blur(5px)' }}
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        className="w-full sm:max-w-md flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
+        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '90dvh' }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
+              style={{ background: 'var(--sage-light)' }}>🔍</div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Beszerzési forrás előnézet</p>
+              <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>{sourceLabel}</p>
+            </div>
+          </div>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all hover:scale-105"
+            style={{ borderColor: 'var(--border)', color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-6 py-5">
+          {submitted ? (
+            <div className="flex flex-col items-center text-center py-6 gap-4">
+              <div className="w-14 h-14 rounded-3xl flex items-center justify-center text-2xl border"
+                style={{ background: 'var(--sage-light)', borderColor: 'var(--sage-border)' }}>✅</div>
+              <div>
+                <p className="text-base font-semibold mb-1.5" style={{ color: 'var(--tx-primary)' }}>Köszönjük!</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+                  Az anyagbeszerzési ajánlások élesítésekor értesítünk.
+                </p>
+              </div>
+              <button onClick={onClose}
+                className="text-sm font-medium rounded-xl px-5 py-2.5 border transition-all"
+                style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface-subtle)' }}>
+                Bezárás
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+                Az éles verzióban itt lokáció, projektfázis és anyagkategória alapján releváns
+                tüzépek, boltok, gyártók és ajánlatok jelenhetnek meg.
+              </p>
+
+              {/* Demo parameter display */}
+              <div className="rounded-2xl p-4 border" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+                <p className="text-[10px] font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--tx-muted)' }}>
+                  Ajánlat paraméterei
+                </p>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { label: 'Projekt típusa',     value: projectLabel },
+                    { label: 'Anyagkategória',     value: category },
+                    { label: 'Forrástípus',        value: sourceLabel },
+                    { label: 'Beszerzés időzítése',value: 'Fázis előtt 2–4 héttel' },
+                  ].map(row => (
+                    <div key={row.label} className="flex justify-between text-[11px]">
+                      <span style={{ color: 'var(--tx-muted)' }}>{row.label}</span>
+                      <span className="font-medium" style={{ color: 'var(--tx-primary)' }}>{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold uppercase tracking-widest mb-1.5"
+                  style={{ color: 'var(--tx-muted)' }}>Lokáció</label>
+                <input className="field-input" value={lokacio} placeholder="pl. Budapest, Győr, Pécs…"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setLokacio(e.target.value)} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {!submitted && (
+          <div className="px-6 py-4 border-t shrink-0 flex items-center justify-between gap-3"
+            style={{ borderColor: 'var(--border)', background: 'var(--surface-subtle)' }}>
+            <button onClick={onClose}
+              className="text-xs font-medium rounded-xl px-4 py-2 border"
+              style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface)' }}>
+              Mégse
+            </button>
+            <button onClick={() => setSubmitted(true)}
+              className="text-sm font-semibold rounded-xl px-5 py-2.5 text-white transition-all hover:scale-[1.02]"
+              style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 3px 10px rgba(74,124,89,.22)' }}>
               Értesítést kérek
             </button>
           </div>

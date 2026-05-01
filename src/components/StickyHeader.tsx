@@ -133,9 +133,9 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
                 <IconSave /><span className="hidden xl:inline">Mentés</span>
               </UtilBtn>
               {showSave && (
-                <Dropdown className="w-68 right-0">
+                <Dropdown className="right-0" style={{ minWidth: '288px' }}>
                   <p className="section-label mb-3">Projekt mentése</p>
-                  <input autoFocus className="field-input mb-3 text-sm"
+                  <input autoFocus className="field-input mb-3 text-sm w-full"
                     value={saveName}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSaveName(e.target.value)}
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSave()}
@@ -312,11 +312,11 @@ function UtilBtn({ children, onClick, title, badge, disabled }: {
   )
 }
 
-function Dropdown({ children, className = '' }: { children: ReactNode; className?: string }) {
+function Dropdown({ children, className = '', style }: { children: ReactNode; className?: string; style?: React.CSSProperties }) {
   const { isDark } = useTheme()
   return (
     <div className={`absolute top-full mt-2 rounded-2xl border z-50 shadow-xl p-4 ${className}`}
-      style={{ background: isDark ? '#1C1C1E' : '#ffffff', borderColor: 'var(--border)' }}>
+      style={{ background: isDark ? '#1C1C1E' : '#ffffff', borderColor: 'var(--border)', ...style }}>
       {children}
     </div>
   )
