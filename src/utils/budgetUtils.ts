@@ -1,11 +1,11 @@
 import type { QualityKey, ProjectKey } from '../types'
 import type { ExecutionModeKey, ComplexityKey } from '../config/modifiers'
 import {
-  COST_PER_M2,
   BUDGET_EXECUTION_MULTIPLIER,
   BUDGET_COMPLEXITY_MULTIPLIER,
   getPhaseDistribution,
   normalizeProjectKey,
+  getCostPerM2,
 } from '../data/budgetConstants'
 
 export interface BudgetEstimate {
@@ -35,7 +35,7 @@ export function calcBudget(
   const isValid = sizeM2 >= 10 && sizeM2 <= 1000
   const reliability: BudgetEstimate['reliabilityLevel'] = isValid ? 'kozepes' : 'alacsony'
 
-  const base    = COST_PER_M2[qualityKey]
+  const base    = getCostPerM2(projectKey, qualityKey)
   const execM   = BUDGET_EXECUTION_MULTIPLIER[executionModeKey]
   const complexM = BUDGET_COMPLEXITY_MULTIPLIER[complexityKey]
 

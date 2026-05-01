@@ -125,11 +125,18 @@ export default function BudgetSection({ form }: Props) {
         className="mt-5 rounded-2xl p-4 border"
         style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}
       >
-        <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-          ⚠️ Az itt látható költségsáv nem garantált ár, nem ajánlat és nem helyettesíti a tételes
-          költségvetést. Célja a nagyságrendi tervezés és döntéstámogatás.
+        <p className="text-[11px] leading-relaxed mb-2" style={{ color: 'var(--tx-muted)' }}>
+          ⚠️ Ez tájékoztató jellegű sávos becslés. A valós költség nagymértékben függ az
+          ingatlan állapotától, műszaki tartalomtól, anyagválasztástól, lokációtól,
+          szakemberáraktól és rejtett hibáktól.
         </p>
-        <div className="flex flex-wrap gap-4 mt-3">
+        {form.projectKey === 'felujitas' && (
+          <p className="text-[11px] leading-relaxed mb-2" style={{ color: 'var(--tx-muted)' }}>
+            💡 Lakásfelújításnál a meglévő hálózatok, burkolatok, gépészet és bontási állapot
+            jelentősen módosíthatják a végső költséget.
+          </p>
+        )}
+        <div className="flex flex-wrap gap-4 mt-2">
           <p className="text-[10px]" style={{ color: 'var(--tx-muted)' }}>
             Adatforrás: belső becslési modell / piaci sávok, később frissíthető adatbázisból
           </p>

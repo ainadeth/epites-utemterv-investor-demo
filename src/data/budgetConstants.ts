@@ -11,18 +11,38 @@
 import type { QualityKey, ProjectKey } from '../types'
 import type { ExecutionModeKey, ComplexityKey } from '../config/modifiers'
 
-// ── Cost per m² by quality level (Ft/m²) ─────────────────────────────────
+// ── Cost per m² by project type AND quality level (Ft/m²) ────────────────
+// These are heuristic demo ranges for MVP validation.
+// Not verified industry data — for decision-support and order-of-magnitude planning only.
 
 export interface CostRange {
   min: number   // Ft/m²
   max: number
 }
 
-export const COST_PER_M2: Record<QualityKey, CostRange> = {
-  alap:    { min: 450_000, max: 600_000 },
-  normal:  { min: 600_000, max: 850_000 },
-  premium: { min: 850_000, max: 1_200_000 },
+export const PROJECT_COST_PER_M2: Record<string, Record<QualityKey, CostRange>> = {
+  // Új családi ház építés
+  hazepites: {
+    alap:    { min: 500_000, max:   700_000 },
+    normal:  { min: 650_000, max:   950_000 },
+    premium: { min: 900_000, max: 1_400_000 },
+  },
+  // Lakásfelújítás (átfogó)
+  felujitas: {
+    alap:    { min: 100_000, max: 180_000 },
+    normal:  { min: 180_000, max: 350_000 },
+    premium: { min: 350_000, max: 600_000 },
+  },
+  // Bővítés / ráépítés
+  bovites: {
+    alap:    { min: 350_000, max:   600_000 },
+    normal:  { min: 550_000, max:   850_000 },
+    premium: { min: 800_000, max: 1_200_000 },
+  },
 }
+
+// Backward-compat alias: defaults to házépítés new-build rates
+export const COST_PER_M2: Record<QualityKey, CostRange> = PROJECT_COST_PER_M2['hazepites']
 
 // ── Budget multipliers (separate from schedule multipliers) ───────────────
 
@@ -104,6 +124,13 @@ export function normalizeProjectKey(key: string | undefined | null): ProjectKey 
     return 'bovites'
   }
   return 'hazepites'
+}
+
+/** Return the correct cost-per-m² for a given project type and quality. */
+export function getCostPerM2(projectKey: string | undefined, qualityKey: QualityKey): CostRange {
+  const normalized = normalizeProjectKey(projectKey)
+  const table = PROJECT_COST_PER_M2[normalized] ?? PROJECT_COST_PER_M2['hazepites']
+  return table[qualityKey] ?? table['normal']
 }
 
 /** Get phase cost distribution for a given project type. Falls back to new-build. */
