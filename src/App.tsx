@@ -16,6 +16,7 @@ import ProPreviewSection from './components/ProPreviewSection'
 import FazisKalkulatorok from './components/FazisKalkulatorok'
 import Cikkek from './components/Cikkek'
 import Szakemberek from './components/Szakemberek'
+import AnyagokSection from './components/AnyagokSection'
 import CTASection from './components/CTASection'
 import StrategicSection from './components/StrategicSection'
 import ScalabilitySection from './components/ScalabilitySection'
@@ -135,7 +136,7 @@ export default function App() {
         {/* ── Fő kalkulátor ── */}
         {activeTab === 'calculator' && (
           <>
-            <HeroSection />
+            <HeroSection onGoToAnyagok={() => handleTabChange('anyagok')} />
 
             <section id="calculator" className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -176,6 +177,11 @@ export default function App() {
             initialCategory={selectedProfCategory}
             onCategoryConsumed={() => setSelectedProfCategory(null)}
           />
+        )}
+
+        {/* ── Anyagok ── */}
+        {activeTab === 'anyagok' && (
+          <AnyagokSection projectKey={form.projectKey} />
         )}
 
         {/* ── Pro terv — shows empty state or scrolls to pro content ── */}

@@ -10,13 +10,14 @@ import PdfLeadModal from './PdfLeadModal'
 
 // ── Tab definitions ────────────────────────────────────────────────────────
 
-export type TabKey = 'calculator' | 'fazis' | 'cikkek' | 'szakemberek' | 'pro' | 'vizió'
+export type TabKey = 'calculator' | 'fazis' | 'cikkek' | 'szakemberek' | 'anyagok' | 'pro' | 'vizió'
 
 const NAV_TABS: { key: TabKey; label: string; icon: string; short: string }[] = [
   { key: 'calculator',  label: 'Fő kalkulátor',      icon: '🏗️', short: 'Kalkulátor'  },
   { key: 'fazis',       label: 'Fázis kalkulátorok', icon: '🔧', short: 'Fázisok'      },
   { key: 'cikkek',      label: 'Cikkek',              icon: '📖', short: 'Cikkek'       },
   { key: 'szakemberek', label: 'Szakemberek',         icon: '👷', short: 'Szakemberek'  },
+  { key: 'anyagok',     label: 'Anyagok',             icon: '🧱', short: 'Anyagok'      },
   { key: 'pro',         label: 'Pro terv',            icon: '✦',  short: 'Pro'          },
   { key: 'vizió',       label: 'Befektetői vízió',   icon: '🚀', short: 'Vízió'        },
 ]
