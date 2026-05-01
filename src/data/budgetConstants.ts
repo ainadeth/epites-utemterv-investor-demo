@@ -56,58 +56,95 @@ export interface CostPhaseDistribution {
 }
 
 const DIST_HAZEPITES: CostPhaseDistribution[] = [
-  { label: 'Tervezés / előkészítés',   pct:  3, icon: '📐' },
-  { label: 'Földmunka / alapozás',      pct: 12, icon: '⛏️' },
-  { label: 'Szerkezetépítés',           pct: 25, icon: '🏗️' },
-  { label: 'Tető',                      pct: 12, icon: '🏠' },
-  { label: 'Nyílászárók',               pct:  8, icon: '🪟' },
-  { label: 'Gépészet és villany',       pct: 18, icon: '⚡' },
-  { label: 'Belső munkák',              pct: 15, icon: '🖌️' },
-  { label: 'Külső munkák / tartalék',   pct:  7, icon: '🌿' },
-]
+  { label: 'Tervezés / előkészítés',        pct:  3, icon: '📐' },
+  { label: 'Földmunka / alapozás',           pct: 12, icon: '⛏️' },
+  { label: 'Szerkezetépítés',                pct: 25, icon: '🏗️' },
+  { label: 'Tető',                           pct: 12, icon: '🏠' },
+  { label: 'Nyílászárók',                    pct:  8, icon: '🪟' },
+  { label: 'Gépészet és villany',            pct: 18, icon: '⚡' },
+  { label: 'Belső munkák',                   pct: 15, icon: '🖌️' },
+  { label: 'Külső munkák / tartalék',        pct:  7, icon: '🌿' },
+]  // sum = 100 ✓
 
 const DIST_FELUJITAS: CostPhaseDistribution[] = [
-  { label: 'Tervezés / felmérés',                  pct:  5, icon: '📐' },
-  { label: 'Bontás',                                pct: 10, icon: '🔨' },
-  { label: 'Villanyszerelés',                       pct: 15, icon: '⚡' },
-  { label: 'Víz / gépészet',                        pct: 15, icon: '🚿' },
-  { label: 'Faljavítás / aljzat / előkészítés',     pct: 10, icon: '🧱' },
-  { label: 'Burkolás',                              pct: 15, icon: '🔲' },
-  { label: 'Festés / befejező munkák',              pct: 10, icon: '🖌️' },
-  { label: 'Konyha / fürdő / szaniterek',           pct: 15, icon: '🛁' },
-  { label: 'Tartalék',                              pct:  5, icon: '🛡️' },
-]
+  { label: 'Tervezés / felmérés',                          pct:  5, icon: '📐' },
+  { label: 'Bontás és sittkezelés',                        pct: 10, icon: '🔨' },
+  { label: 'Villanyhálózat / elektromos korszerűsítés',    pct: 15, icon: '⚡' },
+  { label: 'Víz / gépészet',                               pct: 15, icon: '🚿' },
+  { label: 'Faljavítás / aljzat előkészítés',              pct: 10, icon: '🧱' },
+  { label: 'Burkolás',                                     pct: 15, icon: '🔲' },
+  { label: 'Festés és befejező munkák',                    pct: 10, icon: '🖌️' },
+  { label: 'Nyílászárók / beltéri elemek',                 pct:  8, icon: '🪟' },
+  { label: 'Konyha / fürdő / beépítés',                    pct:  7, icon: '🛁' },
+  { label: 'Tartalék / váratlan költségek',                pct:  5, icon: '🛡️' },
+]  // sum = 100 ✓  (5+10+15+15+10+15+10+8+7+5)
 
 const DIST_BOVITES: CostPhaseDistribution[] = [
-  { label: 'Tervezés / engedélyezés',  pct:  8, icon: '📐' },
-  { label: 'Szerkezeti munkák',         pct: 30, icon: '🏗️' },
-  { label: 'Tető / zárófödém',         pct: 15, icon: '🏠' },
-  { label: 'Nyílászárók',               pct:  8, icon: '🪟' },
-  { label: 'Gépészet és villany',       pct: 18, icon: '⚡' },
-  { label: 'Belső befejező munkák',     pct: 14, icon: '🖌️' },
-  { label: 'Tartalék',                  pct:  7, icon: '🛡️' },
-]
+  { label: 'Tervezés / engedélyezés',       pct:  8, icon: '📐' },
+  { label: 'Alapozás / csatlakozás',         pct: 12, icon: '⛏️' },
+  { label: 'Szerkezeti munkák',              pct: 25, icon: '🏗️' },
+  { label: 'Tető / zárófödém',              pct: 12, icon: '🏠' },
+  { label: 'Nyílászárók',                    pct:  8, icon: '🪟' },
+  { label: 'Gépészet és villany',            pct: 18, icon: '⚡' },
+  { label: 'Belső befejező munkák',          pct: 10, icon: '🖌️' },
+  { label: 'Tartalék',                       pct:  7, icon: '🛡️' },
+]  // sum = 100 ✓
+
+/**
+ * Normalize any project key variant → canonical ProjectKey.
+ * Guards against key mismatches between different parts of the app.
+ */
+export function normalizeProjectKey(key: string | undefined | null): ProjectKey {
+  if (!key) return 'hazepites'
+  const k = key.toLowerCase().replace(/[_\-\s]/g, '')
+  if (k.includes('felujit') || k.includes('lakas') || k.includes('renov') || k.includes('apartment')) {
+    return 'felujitas'
+  }
+  if (k.includes('bov') || k.includes('extend') || k.includes('extension')) {
+    return 'bovites'
+  }
+  return 'hazepites'
+}
 
 /** Get phase cost distribution for a given project type. Falls back to new-build. */
 export function getPhaseDistribution(projectKey: ProjectKey): CostPhaseDistribution[] {
-  if (projectKey === 'felujitas') return DIST_FELUJITAS
-  if (projectKey === 'bovites')   return DIST_BOVITES
-  return DIST_HAZEPITES   // default = hazepites
+  const normalized = normalizeProjectKey(projectKey)
+  if (normalized === 'felujitas') return DIST_FELUJITAS
+  if (normalized === 'bovites')   return DIST_BOVITES
+  return DIST_HAZEPITES
 }
 
 // Keep the old export as an alias for backward compat
 export const COST_PHASE_DISTRIBUTION = DIST_HAZEPITES
 
-// ── Items needed for more accurate estimate ────────────────────────────────
+// ── Items needed for more accurate estimate (project-type-aware) ──────────
 
-export const ACCURACY_IMPROVEMENT_ITEMS: string[] = [
+const ACCURACY_BASE = [
   'Pontos lokáció',
   'Tervdokumentáció',
   'Műszaki tartalom',
-  'Szerkezet típusa',
-  'Tetőforma',
   'Gépészeti igények',
   'Nyílászárók minősége',
   'Burkolatok és belső anyagok szintje',
   'Kivitelezői ajánlatok',
 ]
+
+const ACCURACY_HAZEPITES_EXTRA = [
+  'Szerkezet típusa',
+  'Tetőforma',
+]
+
+const ACCURACY_FELUJITAS_EXTRA = [
+  'Meglévő hálózat állapota',
+  'Bontás mértéke',
+]
+
+export function getAccuracyItems(projectKey?: string): string[] {
+  const normalized = normalizeProjectKey(projectKey)
+  if (normalized === 'felujitas') return [...ACCURACY_BASE, ...ACCURACY_FELUJITAS_EXTRA]
+  if (normalized === 'bovites')   return [...ACCURACY_BASE, 'Szerkezet típusa', 'Csatlakozási pontok']
+  return [...ACCURACY_BASE, ...ACCURACY_HAZEPITES_EXTRA]
+}
+
+// Backward compat alias
+export const ACCURACY_IMPROVEMENT_ITEMS = [...ACCURACY_BASE, ...ACCURACY_HAZEPITES_EXTRA]

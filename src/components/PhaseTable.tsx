@@ -1,20 +1,33 @@
 import { type ReactNode, type MouseEvent } from 'react'
 import type { TimelineRow } from '../types'
-import { formatDate } from '../utils/dateUtils'
 
 const PHASE_COLORS = ['#4A7C59','#4A7090','#9A7A50','#4A8090','#7A7860','#5A6A80','#8A6A50']
 
+// Format date into a compact but readable form: "máj. 12."
+function fmtDate(d: Date): string {
+  return d.toLocaleDateString('hu-HU', { month: 'short', day: 'numeric' })
+}
+
 export default function PhaseTable({ rows }: { rows: TimelineRow[] }) {
   return (
-    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
-      <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse" style={{ minWidth: '480px' }}>
+    <div className="rounded-2xl border overflow-hidden w-full" style={{ borderColor: 'var(--border)' }}>
+      <table
+        className="w-full text-xs border-collapse"
+        style={{ tableLayout: 'fixed' }}
+      >
+        <colgroup>
+          <col style={{ width: '32px' }} />      {/* # */}
+          <col style={{ width: 'auto' }} />       {/* Fázis — flex */}
+          <col style={{ width: '82px' }} />       {/* Kezdés */}
+          <col style={{ width: '82px' }} />       {/* Befejezés */}
+          <col style={{ width: '84px' }} />       {/* Időtartam */}
+        </colgroup>
         <thead>
           <tr style={{ background: 'var(--surface-subtle)' }}>
-            {['#', 'Fázis', 'Kezdés', 'Befejezés', 'Időtartam'].map((h, i) => (
+            {['#', 'Fázis', 'Kezdés', 'Befejezés', 'Idő'].map(h => (
               <th key={h}
-                className="text-left text-[10px] font-semibold uppercase tracking-widest px-3 py-3 border-b"
-                style={{ color: 'var(--tx-muted)', borderColor: 'var(--border)', width: i===0?'36px': i===1?'auto': i>=2&&i<4?'100px':'90px' }}>
+                className="text-left text-[9px] font-semibold uppercase tracking-widest px-2.5 py-2.5 border-b"
+                style={{ color: 'var(--tx-muted)', borderColor: 'var(--border)' }}>
                 {h}
               </th>
             ))}
@@ -23,30 +36,44 @@ export default function PhaseTable({ rows }: { rows: TimelineRow[] }) {
         <tbody>
           {rows.map((row, i) =>
             row.kind === 'phase'
-              ? <PhaseRowItem key={`p-${row.num}`}  row={row} color={PHASE_COLORS[(row.num - 1) % PHASE_COLORS.length]} isLast={i === rows.length - 1} />
-              : <BufferRowItem key={`b-${row.phaseNum}`} row={row} color={PHASE_COLORS[(row.phaseNum - 1) % PHASE_COLORS.length]} isLast={i === rows.length - 1} />
+              ? <PhaseRowItem
+                  key={`p-${row.num}`}
+                  row={row}
+                  color={PHASE_COLORS[(row.num - 1) % PHASE_COLORS.length]}
+                  isLast={i === rows.length - 1}
+                />
+              : <BufferRowItem
+                  key={`b-${row.phaseNum}`}
+                  row={row}
+                  color={PHASE_COLORS[(row.phaseNum - 1) % PHASE_COLORS.length]}
+                  isLast={i === rows.length - 1}
+                />
           )}
         </tbody>
       </table>
-      </div>
     </div>
   )
 }
 
 // ── Phase row ──────────────────────────────────────────────────────────────
 
-function PhaseRowItem({ row, color, isLast }: { key?: string | number; row: Extract<TimelineRow, {kind:'phase'}>; color: string; isLast: boolean }) {
-  const isAdjusted = row.days !== row.baseDays
+function PhaseRowItem({ row, color, isLast }: {
+  key?: string | number
+  row: Extract<TimelineRow, {kind:'phase'}>
+  color: string
+  isLast: boolean
+}) {
+  const isAdjusted  = row.days !== row.baseDays
   const borderStyle = isLast ? undefined : '1px solid var(--border)'
 
   if (row.hidden) {
     return (
       <tr className="opacity-30" style={{ background: 'var(--surface-subtle)' }}>
-        <TdHidden>{row.num}</TdHidden>
-        <TdHidden><span className="italic line-through">{row.name}</span></TdHidden>
-        <TdHidden>–</TdHidden>
-        <TdHidden>–</TdHidden>
-        <TdHidden>–</TdHidden>
+        <Td style={{ borderBottom: borderStyle }}>{row.num}</Td>
+        <Td style={{ borderBottom: borderStyle }}><span className="italic line-through">{row.name}</span></Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
       </tr>
     )
   }
@@ -57,102 +84,108 @@ function PhaseRowItem({ row, color, isLast }: { key?: string | number; row: Extr
       onMouseEnter={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = 'var(--surface-subtle)')}
       onMouseLeave={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = 'transparent')}
     >
-      <td className="px-3 py-3 text-xs font-mono" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{row.num}</td>
-      <td className="px-3 py-3 text-xs font-medium" style={{ color: 'var(--tx-primary)', borderBottom: borderStyle }}>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-          {row.name}
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-muted)', fontFamily: 'monospace' }}>
+        {row.num}
+      </Td>
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-primary)', fontWeight: 500 }}>
+        <div className="flex items-start gap-1.5 min-w-0">
+          <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-1" style={{ background: color }} />
+          <span className="break-words leading-snug">{row.name}</span>
         </div>
-      </td>
-      <td className="px-3 py-3 text-xs" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.start)}</td>
-      <td className="px-3 py-3 text-xs" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.end)}</td>
-      <td className="px-4 py-3" style={{ borderBottom: borderStyle }}>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block text-xs font-semibold rounded-lg px-2.5 py-1"
-            style={{ background: `${color}18`, color }}>
-            {row.days} nap
+      </Td>
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-secondary)', whiteSpace: 'nowrap' }}>
+        {fmtDate(row.start)}
+      </Td>
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-secondary)', whiteSpace: 'nowrap' }}>
+        {fmtDate(row.end)}
+      </Td>
+      <Td style={{ borderBottom: borderStyle }}>
+        <span className="inline-block text-[10px] font-semibold rounded-md px-2 py-0.5 whitespace-nowrap"
+          style={{ background: `${color}18`, color }}>
+          {row.days}n
+        </span>
+        {isAdjusted && (
+          <span className="ml-1 text-[9px] line-through"
+            style={{ color: 'var(--tx-muted)' }}
+            title={`Alap: ${row.baseDays} nap`}>
+            {row.baseDays}
           </span>
-          {isAdjusted && (
-            <span className="inline-block text-[10px] line-through rounded px-1.5 py-0.5"
-              style={{ color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}
-              title={`Alap időtartam: ${row.baseDays} nap`}>
-              {row.baseDays}
-            </span>
-          )}
-        </div>
-      </td>
+        )}
+      </Td>
     </tr>
   )
 }
 
 // ── Buffer row ─────────────────────────────────────────────────────────────
 
-function BufferRowItem({ row, color, isLast }: { key?: string | number; row: Extract<TimelineRow, {kind:'buffer'}>; color: string; isLast: boolean }) {
-  const borderStyle = isLast ? undefined : '1px solid var(--border)'
-  const isAdjusted  = row.days !== row.baseDays
+function BufferRowItem({ row, color, isLast }: {
+  key?: string | number
+  row: Extract<TimelineRow, {kind:'buffer'}>
+  color: string
+  isLast: boolean
+}) {
+  const borderStyle  = isLast ? undefined : '1px solid var(--border)'
+  const isAdjusted   = row.days !== row.baseDays
+  const mutedBg      = `${color}0A`
+  const mutedBorder  = `${color}30`
 
   if (row.hidden) {
     return (
       <tr className="opacity-20" style={{ background: 'var(--surface-subtle)' }}>
-        <TdHidden></TdHidden>
-        <TdHidden><span className="italic line-through text-[11px]">{row.name}</span></TdHidden>
-        <TdHidden>–</TdHidden>
-        <TdHidden>–</TdHidden>
-        <TdHidden>–</TdHidden>
+        <Td style={{ borderBottom: borderStyle }} />
+        <Td style={{ borderBottom: borderStyle }}><span className="italic line-through">{row.name}</span></Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
+        <Td style={{ borderBottom: borderStyle }}>–</Td>
       </tr>
     )
   }
 
-  // Derive a muted version of the parent phase color
-  const mutedBg    = `${color}0A`   // 4% fill
-  const mutedBorder = `${color}30`  // 19% border
-
   return (
     <tr
       className="transition-colors"
+      style={{ background: mutedBg }}
       onMouseEnter={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = 'var(--surface-subtle)')}
       onMouseLeave={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = mutedBg)}
-      style={{ background: mutedBg }}
     >
-      {/* Empty # cell — visually grouped under parent */}
-      <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>
-        <span className="text-[10px] opacity-40">↳</span>
-      </td>
-      <td className="px-3 py-2.5" style={{ borderBottom: borderStyle }}>
-        <div className="flex items-center gap-2">
-          {/* Dashed indicator */}
-          <span className="w-2 h-2 rounded-sm shrink-0 border"
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-muted)' }}>
+        <span style={{ fontSize: '10px', opacity: .4 }}>↳</span>
+      </Td>
+      <Td style={{ borderBottom: borderStyle }}>
+        <div className="flex items-start gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-sm shrink-0 mt-1 border"
             style={{ borderColor: mutedBorder, borderStyle: 'dashed', background: 'transparent' }} />
-          <span className="text-xs italic" style={{ color: 'var(--tx-muted)' }}>{row.name}</span>
+          <span className="text-[10px] italic leading-snug" style={{ color: 'var(--tx-muted)' }}>{row.name}</span>
         </div>
-      </td>
-      <td className="px-4 py-2.5 whitespace-nowrap text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{formatDate(row.start)}</td>
-      <td className="px-4 py-2.5 whitespace-nowrap text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{formatDate(row.end)}</td>
-      <td className="px-3 py-2.5" style={{ borderBottom: borderStyle }}>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block text-[11px] font-medium rounded-lg px-2.5 py-1 border italic"
-            style={{ background: mutedBg, borderColor: mutedBorder, color: 'var(--tx-muted)', borderStyle: 'dashed' }}>
-            {row.days} nap
-          </span>
-          {isAdjusted && (
-            <span className="inline-block text-[10px] line-through rounded px-1.5 py-0.5"
-              style={{ color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}
-              title={`Alap: ${row.baseDays} nap`}>
-              {row.baseDays}
-            </span>
-          )}
-        </div>
-      </td>
+      </Td>
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-muted)', whiteSpace: 'nowrap' }}>
+        {fmtDate(row.start)}
+      </Td>
+      <Td style={{ borderBottom: borderStyle, color: 'var(--tx-muted)', whiteSpace: 'nowrap' }}>
+        {fmtDate(row.end)}
+      </Td>
+      <Td style={{ borderBottom: borderStyle }}>
+        <span className="inline-block text-[10px] rounded-md px-2 py-0.5 italic border whitespace-nowrap"
+          style={{ background: mutedBg, borderColor: mutedBorder, borderStyle: 'dashed', color: 'var(--tx-muted)' }}>
+          {row.days}n
+        </span>
+        {isAdjusted && (
+          <span className="ml-1 text-[9px] line-through" style={{ color: 'var(--tx-muted)' }}
+            title={`Alap: ${row.baseDays} nap`}>{row.baseDays}</span>
+        )}
+      </Td>
     </tr>
   )
 }
 
-// ── Shared hidden cell ─────────────────────────────────────────────────────
+// ── Shared cell ────────────────────────────────────────────────────────────
 
-function TdHidden({ children }: { children?: ReactNode }) {
+function Td({ children, style }: { children?: ReactNode; style?: React.CSSProperties }) {
   return (
-    <td className="px-4 py-3 border-b text-xs" style={{ color: 'var(--tx-muted)', borderColor: 'var(--border)' }}>
+    <td className="px-2.5 py-2" style={{ fontSize: '11px', ...style }}>
       {children}
     </td>
   )
 }
+
+import React from 'react'

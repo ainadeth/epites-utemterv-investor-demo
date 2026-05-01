@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from 'react'
 import type { FormState } from '../types'
 import { calcBudget, getBudgetStatus, formatFt, formatPerM2, type BudgetEstimate } from '../utils/budgetUtils'
-import { ACCURACY_IMPROVEMENT_ITEMS } from '../data/budgetConstants'
+import { getAccuracyItems } from '../data/budgetConstants'
 import BudgetRefinement from './BudgetRefinement'
 
 interface Props {
@@ -115,7 +115,7 @@ export default function BudgetSection({ form }: Props) {
       </div>
 
       {/* ── Accuracy section ── */}
-      <AccuracyBlock reliability={estimate.reliabilityLevel} />
+      <AccuracyBlock reliability={estimate.reliabilityLevel} projectKey={form.projectKey} />
 
       {/* ── Optional refinement block ── */}
       <BudgetRefinement estimate={estimate} projectKey={form.projectKey} />
@@ -262,7 +262,8 @@ function ReliabilityBadge({ cfg }: { cfg: typeof RELIABILITY_CONFIG[keyof typeof
   )
 }
 
-function AccuracyBlock({ reliability }: { reliability: BudgetEstimate['reliabilityLevel'] }) {
+function AccuracyBlock({ reliability, projectKey }: { reliability: BudgetEstimate['reliabilityLevel']; projectKey?: string }) {
+  const items = getAccuracyItems(projectKey)
   return (
     <div
       className="rounded-2xl p-5 border"
@@ -272,7 +273,7 @@ function AccuracyBlock({ reliability }: { reliability: BudgetEstimate['reliabili
         Pontosabb becsléshez még ezek kellenének
       </p>
       <div className="flex flex-wrap gap-2 mb-3">
-        {ACCURACY_IMPROVEMENT_ITEMS.map(item => (
+        {items.map(item => (
           <span
             key={item}
             className="text-[11px] rounded-lg px-2.5 py-1 border"
