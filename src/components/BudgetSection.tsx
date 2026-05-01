@@ -118,7 +118,7 @@ export default function BudgetSection({ form }: Props) {
       <AccuracyBlock reliability={estimate.reliabilityLevel} />
 
       {/* ── Optional refinement block ── */}
-      <BudgetRefinement estimate={estimate} />
+      <BudgetRefinement estimate={estimate} projectKey={form.projectKey} />
 
       {/* ── Disclaimer ── */}
       <div

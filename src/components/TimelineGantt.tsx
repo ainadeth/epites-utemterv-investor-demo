@@ -11,22 +11,22 @@ interface Props {
 }
 
 const PALETTE = [
-  { bg: '#DBEAFE', border: '#93C5FD', text: '#1D4ED8', fill: '#3B82F6' },
-  { bg: '#EDE9FE', border: '#C4B5FD', text: '#5B21B6', fill: '#8B5CF6' },
-  { bg: '#D1FAE5', border: '#6EE7B7', text: '#065F46', fill: '#10B981' },
-  { bg: '#FEF3C7', border: '#FCD34D', text: '#92400E', fill: '#F59E0B' },
-  { bg: '#FCE7F3', border: '#F9A8D4', text: '#9D174D', fill: '#EC4899' },
-  { bg: '#CFFAFE', border: '#67E8F9', text: '#155E75', fill: '#06B6D4' },
-  { bg: '#E0E7FF', border: '#A5B4FC', text: '#3730A3', fill: '#6366F1' },
+  { bg: '#E8F5EC', border: '#A8C5B0', text: '#2D5C3A', fill: '#4A7C59' },  // sage green
+  { bg: '#E8F0F7', border: '#A8BDD4', text: '#2A4A6B', fill: '#4A7090' },  // mist blue
+  { bg: '#F5F0E8', border: '#D4C4A8', text: '#5C4A2A', fill: '#9A7A50' },  // warm sand
+  { bg: '#E8F2F5', border: '#A8CADA', text: '#2A5060', fill: '#4A8090' },  // slate teal
+  { bg: '#F0EEE8', border: '#C8C4B0', text: '#4A4A38', fill: '#7A7860' },  // stone
+  { bg: '#EEF0F5', border: '#B8C4D8', text: '#3A4A60', fill: '#5A6A80' },  // blue-grey
+  { bg: '#F5EEE8', border: '#D8C4B0', text: '#604A38', fill: '#8A6A50' },  // terracotta
 ]
 const DARK_PALETTE = [
-  { bg: '#1e3a5f', border: '#3B82F6', text: '#93C5FD', fill: '#3B82F6' },
-  { bg: '#2e1a5c', border: '#8B5CF6', text: '#C4B5FD', fill: '#8B5CF6' },
-  { bg: '#064e3b', border: '#10B981', text: '#6EE7B7', fill: '#10B981' },
-  { bg: '#451a03', border: '#F59E0B', text: '#FCD34D', fill: '#F59E0B' },
-  { bg: '#500724', border: '#EC4899', text: '#F9A8D4', fill: '#EC4899' },
-  { bg: '#083344', border: '#06B6D4', text: '#67E8F9', fill: '#06B6D4' },
-  { bg: '#1e1b4b', border: '#6366F1', text: '#A5B4FC', fill: '#6366F1' },
+  { bg: '#1a2e20', border: '#4A7C59', text: '#A8C5B0', fill: '#4A7C59' },
+  { bg: '#1a2430', border: '#4A7090', text: '#A8BDD4', fill: '#4A7090' },
+  { bg: '#2a2018', border: '#9A7A50', text: '#D4C4A8', fill: '#9A7A50' },
+  { bg: '#182430', border: '#4A8090', text: '#A8CADA', fill: '#4A8090' },
+  { bg: '#242420', border: '#7A7860', text: '#C8C4B0', fill: '#7A7860' },
+  { bg: '#1a2030', border: '#5A6A80', text: '#B8C4D8', fill: '#5A6A80' },
+  { bg: '#281e18', border: '#8A6A50', text: '#D8C4B0', fill: '#8A6A50' },
 ]
 
 function dayOffset(rowStart: Date, projectStart: Date): number {
@@ -239,7 +239,7 @@ export default function TimelineGantt({ result, statusKey, onNavigateToProfessio
 
       {/* Status marker label */}
       {progressPct > 0 && (
-        <p className="mt-3 text-xs flex items-center gap-1.5" style={{ color: '#3B82F6' }}>
+        <p className="mt-3 text-xs flex items-center gap-1.5" style={{ color: '#4A7C59' }}>
           <span className="w-3 h-0.5 bg-blue-500 inline-block rounded" />
           Jelenlegi állapot határa – {progressDay}. nap
         </p>
@@ -273,7 +273,7 @@ export default function TimelineGantt({ result, statusKey, onNavigateToProfessio
 
         <input type="range" min={0} max={totalDays - 1} step={1} value={sliderDay}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setSliderDay(Number(e.target.value))}
-          style={{ background: `linear-gradient(to right, #3B82F6 ${sliderPct}%, var(--border) ${sliderPct}%)` }} />
+          style={{ background: `linear-gradient(to right, #4A7C59 ${sliderPct}%, var(--border) ${sliderPct}%)` }} />
 
         <div className="flex justify-between mt-1.5 text-[10px]" style={{ color: 'var(--tx-muted)' }}>
           <span>0. nap – {formatDate(result.projectStart)}</span>

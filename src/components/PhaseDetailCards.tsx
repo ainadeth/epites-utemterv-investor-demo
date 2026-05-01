@@ -7,7 +7,7 @@ interface Props {
   result: TimelineResult
 }
 
-const PHASE_COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899', '#06B6D4', '#6366F1']
+const PHASE_COLORS = ['#4A7C59', '#4A7090', '#9A7A50', '#4A8090', '#7A7860', '#5A6A80', '#8A6A50']
 
 export default function PhaseDetailCards({ result }: Props) {
   const phaseRows = result.rows.filter(

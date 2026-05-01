@@ -8,13 +8,14 @@ export default function OutputCard({ result }: { result: TimelineResult | null }
     <div className="card overflow-hidden animate-fade-up" style={{ animationDelay: '80ms' }}>
       {result === null
         ? <EmptyState />
-        : <div className="p-7 animate-scale-in">
-            <div className="flex items-center justify-between gap-3 mb-6 pb-5 border-b flex-wrap" style={{ borderColor: 'var(--border)' }}>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-lg">✅</div>
-                <div>
+        : <div className="p-6 animate-scale-in">
+            <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b flex-wrap min-w-0" style={{ borderColor: 'var(--border)' }}>
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center text-base shrink-0"
+                  style={{ background: '#E8F5EC' }}>✅</div>
+                <div className="min-w-0">
                   <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Ütemterv</p>
-                  <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>Automatikusan kiszámított ütemezés</p>
+                  <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>Fázisonkénti bontás</p>
                 </div>
               </div>
               <FinalMultiplierPill result={result} />
@@ -38,15 +39,15 @@ function FinalMultiplierPill({ result }: { result: TimelineResult }) {
 
   return (
     <div
-      className="flex items-center gap-2 rounded-xl px-3 py-1.5 border text-xs font-medium shrink-0 transition-all"
+      className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 border text-xs font-medium shrink-0 transition-all max-w-[200px]"
       style={{ background: bg, borderColor: border, color }}
       title={`Méret: ${sizeM2} m² · Végső szorzó: ${finalMultiplier.toFixed(3)}×`}
     >
-      <span className="text-sm">📐</span>
-      <span>
+      <span className="text-sm shrink-0">📐</span>
+      <span className="truncate">
         <span className="font-bold">{sizeM2} m²</span>
         {' · '}
-        <span>Végső szorzó: {finalMultiplier.toFixed(2).replace('.', ',')}×</span>
+        <span>{finalMultiplier.toFixed(2).replace('.', ',')}×</span>
       </span>
     </div>
   )

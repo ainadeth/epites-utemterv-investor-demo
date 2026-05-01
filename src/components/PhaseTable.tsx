@@ -2,18 +2,19 @@ import { type ReactNode, type MouseEvent } from 'react'
 import type { TimelineRow } from '../types'
 import { formatDate } from '../utils/dateUtils'
 
-const PHASE_COLORS = ['#3B82F6','#8B5CF6','#10B981','#F59E0B','#EC4899','#06B6D4','#6366F1']
+const PHASE_COLORS = ['#4A7C59','#4A7090','#9A7A50','#4A8090','#7A7860','#5A6A80','#8A6A50']
 
 export default function PhaseTable({ rows }: { rows: TimelineRow[] }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: 'var(--border)' }}>
-      <table className="w-full text-sm border-collapse">
+    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+      <div className="overflow-x-auto">
+      <table className="w-full text-sm border-collapse" style={{ minWidth: '480px' }}>
         <thead>
           <tr style={{ background: 'var(--surface-subtle)' }}>
-            {['#', 'Fázis', 'Kezdés', 'Befejezés', 'Időtartam'].map(h => (
+            {['#', 'Fázis', 'Kezdés', 'Befejezés', 'Időtartam'].map((h, i) => (
               <th key={h}
-                className="text-left text-[10px] font-semibold uppercase tracking-widest px-4 py-3 border-b"
-                style={{ color: 'var(--tx-muted)', borderColor: 'var(--border)' }}>
+                className="text-left text-[10px] font-semibold uppercase tracking-widest px-3 py-3 border-b"
+                style={{ color: 'var(--tx-muted)', borderColor: 'var(--border)', width: i===0?'36px': i===1?'auto': i>=2&&i<4?'100px':'90px' }}>
                 {h}
               </th>
             ))}
@@ -27,6 +28,7 @@ export default function PhaseTable({ rows }: { rows: TimelineRow[] }) {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
@@ -55,15 +57,15 @@ function PhaseRowItem({ row, color, isLast }: { key?: string | number; row: Extr
       onMouseEnter={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = 'var(--surface-subtle)')}
       onMouseLeave={(e: MouseEvent<HTMLTableRowElement>) => (e.currentTarget.style.background = 'transparent')}
     >
-      <td className="px-4 py-3 text-xs font-mono" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{row.num}</td>
-      <td className="px-4 py-3 font-medium" style={{ color: 'var(--tx-primary)', borderBottom: borderStyle }}>
+      <td className="px-3 py-3 text-xs font-mono" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{row.num}</td>
+      <td className="px-3 py-3 text-xs font-medium" style={{ color: 'var(--tx-primary)', borderBottom: borderStyle }}>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
           {row.name}
         </div>
       </td>
-      <td className="px-4 py-3 whitespace-nowrap text-sm" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.start)}</td>
-      <td className="px-4 py-3 whitespace-nowrap text-sm" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.end)}</td>
+      <td className="px-3 py-3 text-xs" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.start)}</td>
+      <td className="px-3 py-3 text-xs" style={{ color: 'var(--tx-secondary)', borderBottom: borderStyle }}>{formatDate(row.end)}</td>
       <td className="px-4 py-3" style={{ borderBottom: borderStyle }}>
         <div className="flex items-center gap-1.5">
           <span className="inline-block text-xs font-semibold rounded-lg px-2.5 py-1"
@@ -116,7 +118,7 @@ function BufferRowItem({ row, color, isLast }: { key?: string | number; row: Ext
       <td className="px-4 py-2.5 text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>
         <span className="text-[10px] opacity-40">↳</span>
       </td>
-      <td className="px-4 py-2.5" style={{ borderBottom: borderStyle }}>
+      <td className="px-3 py-2.5" style={{ borderBottom: borderStyle }}>
         <div className="flex items-center gap-2">
           {/* Dashed indicator */}
           <span className="w-2 h-2 rounded-sm shrink-0 border"
@@ -126,7 +128,7 @@ function BufferRowItem({ row, color, isLast }: { key?: string | number; row: Ext
       </td>
       <td className="px-4 py-2.5 whitespace-nowrap text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{formatDate(row.start)}</td>
       <td className="px-4 py-2.5 whitespace-nowrap text-xs" style={{ color: 'var(--tx-muted)', borderBottom: borderStyle }}>{formatDate(row.end)}</td>
-      <td className="px-4 py-2.5" style={{ borderBottom: borderStyle }}>
+      <td className="px-3 py-2.5" style={{ borderBottom: borderStyle }}>
         <div className="flex items-center gap-1.5">
           <span className="inline-block text-[11px] font-medium rounded-lg px-2.5 py-1 border italic"
             style={{ background: mutedBg, borderColor: mutedBorder, color: 'var(--tx-muted)', borderStyle: 'dashed' }}>

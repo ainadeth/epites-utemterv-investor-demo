@@ -1,7 +1,7 @@
 import type { TimelineResult, TimelineRow } from '../types'
 import { formatDate } from '../utils/dateUtils'
 
-const PHASE_COLORS = ['#3B82F6','#8B5CF6','#10B981','#F59E0B','#EC4899','#06B6D4','#6366F1']
+const PHASE_COLORS = ['#4A7C59','#4A7090','#9A7A50','#4A8090','#7A7860','#5A6A80','#8A6A50']
 
 export default function InsightsPanel({ result }: { result: TimelineResult }) {
   const phaseRows  = result.rows.filter((r): r is Extract<TimelineRow,{kind:'phase'}> => r.kind === 'phase')

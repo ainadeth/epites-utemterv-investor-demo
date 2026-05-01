@@ -13,16 +13,24 @@ import {
 
 interface Props {
   estimate: BudgetEstimate
+  projectKey?: string
 }
 
 type Answers = Record<string, number>   // questionId → option score (0 | 1 | 2)
 
-export default function BudgetRefinement({ estimate }: Props) {
+// Questions irrelevant for renovation (no roof, no telek for apartments)
+const FELUJITAS_SKIP = new Set(['teto', 'telek'])
+
+export default function BudgetRefinement({ estimate, projectKey }: Props) {
+  const questions = projectKey === 'felujitas'
+    ? REFINEMENT_QUESTIONS.filter(q => !FELUJITAS_SKIP.has(q.id))
+    : REFINEMENT_QUESTIONS
+
   const [open, setOpen]       = useState(false)
   const [answers, setAnswers] = useState<Answers>({})
 
   const answeredCount = Object.keys(answers).length
-  const allAnswered   = answeredCount === REFINEMENT_QUESTIONS.length
+  const allAnswered   = answeredCount === questions.length
 
   // ── Risk computation ────────────────────────────────────────────────────
   const totalScore = (Object.values(answers) as number[]).reduce((s: number, v: number) => s + v, 0)
@@ -35,7 +43,7 @@ export default function BudgetRefinement({ estimate }: Props) {
   const refinedMax = Math.round(estimate.maxTotal * adjustment.maxFactor / 100_000) * 100_000
 
   // ── High-risk factors (score > 0) ───────────────────────────────────────
-  const riskFactors = REFINEMENT_QUESTIONS
+  const riskFactors = questions
     .filter(q => (answers[q.id] ?? 0) > 0)
     .map(q => {
       const score  = answers[q.id] ?? 0
@@ -68,7 +76,7 @@ export default function BudgetRefinement({ estimate }: Props) {
             {!open && (
               <p className="text-xs mt-0.5" style={{ color: 'var(--tx-muted)' }}>
                 {answeredCount > 0
-                  ? `${answeredCount} / ${REFINEMENT_QUESTIONS.length} kérdés megválaszolva`
+                  ? `${answeredCount} / ${questions.length} kérdés megválaszolva`
                   : 'Néhány extra kérdéssel finomítható a becslés'}
               </p>
             )}
@@ -87,7 +95,7 @@ export default function BudgetRefinement({ estimate }: Props) {
             <span
               className="text-[11px] font-semibold rounded-xl px-3.5 py-2 border transition-all hover:scale-[1.02] active:scale-[.98]"
               style={{
-                background: 'linear-gradient(135deg, #1D4ED8, #4F46E5)',
+                background: 'linear-gradient(135deg, #3D6B4A, #4A7C59)',
                 borderColor: 'transparent',
                 color: '#fff',
               }}
@@ -111,7 +119,7 @@ export default function BudgetRefinement({ estimate }: Props) {
 
           {/* Questions */}
           <div className="flex flex-col gap-4 mb-6">
-            {REFINEMENT_QUESTIONS.map(q => (
+            {questions.map(q => (
               <QuestionBlock
                 key={q.id}
                 question={q}
@@ -137,7 +145,7 @@ export default function BudgetRefinement({ estimate }: Props) {
           {/* Partial progress hint */}
           {!allAnswered && answeredCount > 0 && (
             <p className="text-xs text-center mt-2" style={{ color: 'var(--tx-muted)' }}>
-              Még {REFINEMENT_QUESTIONS.length - answeredCount} kérdés van hátra a finomított eredményhez
+              Még {questions.length - answeredCount} kérdés van hátra a finomított eredményhez
             </p>
           )}
         </div>

@@ -140,13 +140,13 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
                 onClick={() => switchTab(tab.key)}
                 className="relative px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-150 whitespace-nowrap"
                 style={{
-                  color:      activeTab === tab.key ? '#2563EB' : 'var(--tx-secondary)',
-                  background: activeTab === tab.key ? (D ? 'rgba(37,99,235,.15)' : '#EFF6FF') : 'transparent',
+                  color:      activeTab === tab.key ? '#4A7C59' : 'var(--tx-secondary)',
+                  background: activeTab === tab.key ? (D ? 'rgba(74,124,89,.12)' : '#E8F5EC') : 'transparent',
                 }}
               >
                 {tab.label}
                 {activeTab === tab.key && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-blue-500" />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-[#4A7C59]" />
                 )}
               </button>
             ))}
@@ -195,7 +195,7 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
                     : <ul className="max-h-60 overflow-y-auto divide-y" style={{ borderColor: 'var(--border)' }}>
                         {projects.map((p: (typeof projects)[0]) => (
                           <li key={p.id}
-                            className="flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-blue-500/5 transition-colors"
+                            className="flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-[#4A7C59]/10 transition-colors"
                             onClick={() => { onLoadProject(p.form); setShowProjects(false) }}
                           >
                             <div className="flex-1 min-w-0">
@@ -267,8 +267,8 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
                       className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm transition-colors border-b last:border-0"
                       style={{
                         borderColor: 'var(--border)',
-                        background:  activeTab === tab.key ? (D ? 'rgba(37,99,235,.12)' : '#EFF6FF') : 'transparent',
-                        color:       activeTab === tab.key ? '#2563EB' : 'var(--tx-primary)',
+                        background:  activeTab === tab.key ? (D ? 'rgba(37,99,235,.12)' : '#E8F5EC') : 'transparent',
+                        color:       activeTab === tab.key ? '#4A7C59' : 'var(--tx-primary)',
                         fontWeight:  activeTab === tab.key ? 600 : 400,
                       }}
                     >
@@ -315,7 +315,7 @@ function UtilBtn({ children, onClick, title, badge, disabled }: {
     >
       {children}
       {badge !== undefined && badge > 0 && (
-        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-blue-600 text-white text-[9px] font-bold flex items-center justify-center">{badge}</span>
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#4A7C59] text-white text-[9px] font-bold flex items-center justify-center">{badge}</span>
       )}
     </button>
   )

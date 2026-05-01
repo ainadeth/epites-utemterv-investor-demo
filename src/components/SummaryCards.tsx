@@ -15,7 +15,7 @@ export default function SummaryCards({ result }: { result: TimelineResult }) {
       <RiskBadge result={result} />
 
       {/* Three summary metric cards */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 mb-6" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
         {items.map(it => (
           <div key={it.label}
             className="rounded-2xl p-4 border transition-all hover:scale-[1.01]"
