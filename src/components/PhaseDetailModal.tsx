@@ -174,15 +174,8 @@ export default function PhaseDetailModal({ phaseName, onClose, onNavigateToProfe
   }, [onClose])
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div
-        className="relative w-full sm:max-w-2xl flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
-        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.3)', maxHeight: '92dvh' }}
-      >
+    <Modal isOpen={true} onClose={onClose} size="lg">
+      <div>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
           <div>
@@ -269,7 +262,7 @@ export default function PhaseDetailModal({ phaseName, onClose, onNavigateToProfe
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }
 
@@ -328,3 +321,4 @@ function TagList({ items, color, bg, border, onClickItem }: {
 }
 
 import React from 'react'
+import { Modal } from './ui/Modal'

@@ -1,59 +1,61 @@
 import { useState, useEffect, type ChangeEvent } from 'react'
 import React from 'react'
+import { loadSavedProjects, type SavedProject } from '../utils/storageUtils'
+import { PROJECTS } from '../data/projects'
+import { calcBudget, formatFt } from '../utils/budgetUtils'
+import { Modal, ModalCloseBtn } from './ui/Modal'
 
 // ── Demo project data ──────────────────────────────────────────────────────
 
 interface DemoProject {
-  id: string
-  name: string
-  type: string
-  location: string
-  status: string
-  statusColor: 'green' | 'sand' | 'mist'
-  progress: number
-  nextMilestone: string
-  budget: string
-  icon: string
+  id: string; name: string; type: string; location: string
+  status: string; statusColor: 'green' | 'sand' | 'mist'
+  progress: number; nextMilestone: string; budget: string; icon: string
+  isDemo: true
 }
 
 const DEMO_PROJECTS: DemoProject[] = [
   {
-    id: 'p1',
-    name: 'Napliget Ház',
-    type: 'Családi ház építés',
-    location: 'Budapest környéke',
-    status: 'Tervezés alatt',
-    statusColor: 'mist',
-    progress: 18,
-    nextMilestone: 'Alapozás előkészítése',
-    budget: '65–95 millió Ft',
-    icon: '🏠',
+    id: 'd1', name: 'Napliget Ház', type: 'Családi ház építés', location: 'Budapest környéke',
+    status: 'Tervezés alatt', statusColor: 'mist', progress: 18,
+    nextMilestone: 'Alapozás előkészítése', budget: '65–95 millió Ft', icon: '🏠', isDemo: true,
   },
   {
-    id: 'p2',
-    name: 'Belvárosi lakásfelújítás',
-    type: 'Lakásfelújítás',
-    location: 'Budapest V. kerület',
-    status: 'Kivitelezés előtt',
-    statusColor: 'sand',
-    progress: 32,
-    nextMilestone: 'Bontás és sittkezelés',
-    budget: '18–35 millió Ft',
-    icon: '🏢',
+    id: 'd2', name: 'Belvárosi lakásfelújítás', type: 'Lakásfelújítás', location: 'Budapest V. kerület',
+    status: 'Kivitelezés előtt', statusColor: 'sand', progress: 32,
+    nextMilestone: 'Bontás és sittkezelés', budget: '18–35 millió Ft', icon: '🏢', isDemo: true,
   },
   {
-    id: 'p3',
-    name: 'Balatoni fürdőszoba',
-    type: 'Fürdőszoba felújítás',
-    location: 'Alsóörs',
-    status: 'Anyagválasztás',
-    statusColor: 'green',
-    progress: 45,
-    nextMilestone: 'Burkolat kiválasztása',
-    budget: '2,5–5 millió Ft',
-    icon: '🚿',
+    id: 'd3', name: 'Balatoni fürdőszoba', type: 'Fürdőszoba felújítás', location: 'Alsóörs',
+    status: 'Anyagválasztás', statusColor: 'green', progress: 45,
+    nextMilestone: 'Burkolat kiválasztása', budget: '2,5–5 millió Ft', icon: '🚿', isDemo: true,
   },
 ]
+
+// ── Unified card type (saved OR demo) ─────────────────────────────────────
+
+interface CardData {
+  id: string; name: string; type: string; location?: string
+  status: string; statusColor: 'green' | 'sand' | 'mist'
+  progress: number; nextMilestone?: string; budget?: string; icon: string
+  isDemo: boolean; savedProject?: SavedProject
+}
+
+function savedToCard(sp: SavedProject): CardData {
+  const label = PROJECTS[sp.form.projectKey]?.label ?? sp.form.projectKey
+  const budget = calcBudget(sp.form.sizeM2, sp.form.qualityKey, sp.form.executionModeKey, sp.form.complexityKey, sp.form.projectKey)
+  const icons: Record<string, string> = { hazepites: '🏠', felujitas: '🏢', bovites: '🏗️' }
+  return {
+    id: sp.id, name: sp.name, type: label,
+    status: 'Mentett', statusColor: 'mist',
+    progress: 0,
+    budget: `${formatFt(budget.minTotal)} – ${formatFt(budget.maxTotal)}`,
+    icon: icons[sp.form.projectKey] ?? '📁',
+    isDemo: false, savedProject: sp,
+  }
+}
+
+// ── Styles ─────────────────────────────────────────────────────────────────
 
 const STATUS_STYLES = {
   green: { bg: '#E8F5EC', border: '#A8C5B0', color: '#2D5C3A' },
@@ -61,30 +63,39 @@ const STATUS_STYLES = {
   mist:  { bg: '#E8F0F7', border: '#A8BDD4', color: '#2A4A6B' },
 }
 
-// ── Role access cards ──────────────────────────────────────────────────────
-
 const ROLE_CARDS = [
-  { icon: '🏠', role: 'Tulajdonos',          desc: 'Teljes projektáttekintés, költség, dokumentumok, döntési pontok.' },
-  { icon: '📋', role: 'Projektmenedzser',     desc: 'Fázisok kezelése, szakemberek koordinálása, státuszfrissítés.' },
-  { icon: '🔧', role: 'Generálkivitelező',    desc: 'Teljes kivitelezési ütemterv, határidők, szakági egyeztetés.' },
-  { icon: '👷', role: 'Szakember',            desc: 'Csak a hozzá tartozó fázisok, előfeltételek és következő lépések.' },
+  { icon: '🏠', role: 'Tulajdonos',        desc: 'Teljes projektáttekintés, költség, dokumentumok, döntési pontok.' },
+  { icon: '📋', role: 'Projektmenedzser',   desc: 'Fázisok kezelése, szakemberek koordinálása, státuszfrissítés.' },
+  { icon: '🔧', role: 'Generálkivitelező',  desc: 'Teljes kivitelezési ütemterv, határidők, szakági egyeztetés.' },
+  { icon: '👷', role: 'Szakember',          desc: 'Csak a hozzá tartozó fázisok, előfeltételek és következő lépések.' },
 ]
 
-// ── Preview blocks ─────────────────────────────────────────────────────────
-
 const DETAIL_BLOCKS = [
-  { icon: '⏱️', title: 'Ütemterv',        text: 'A projekt fő fázisai és várható határidői egy helyen.' },
-  { icon: '💰', title: 'Költségkeret',    text: 'Becsült költségsáv, rendelkezésre álló keret és kockázati jelzések.' },
-  { icon: '👷', title: 'Szakemberek',     text: 'Később itt látszanak a projekthez rendelt szakemberek és jogosultságaik.' },
-  { icon: '🧱', title: 'Anyaglista',      text: 'Fázisokhoz kapcsolódó anyagkategóriák, beszerzési időzítés és ajánlatok.' },
-  { icon: '📄', title: 'Dokumentumok',    text: 'PDF exportok, checklisták, tervek és későbbi feltöltött fájlok.' },
+  { icon: '⏱️', title: 'Ütemterv',     text: 'A projekt fő fázisai és várható határidői egy helyen.' },
+  { icon: '💰', title: 'Költségkeret', text: 'Becsült költségsáv, rendelkezésre álló keret és kockázati jelzések.' },
+  { icon: '👷', title: 'Szakemberek',  text: 'Később itt látszanak a projekthez rendelt szakemberek és jogosultságaik.' },
+  { icon: '🧱', title: 'Anyaglista',   text: 'Fázisokhoz kapcsolódó anyagkategóriák, beszerzési időzítés és ajánlatok.' },
+  { icon: '📄', title: 'Dokumentumok', text: 'PDF exportok, checklisták, tervek és későbbi feltöltött fájlok.' },
 ]
 
 // ── Main section ───────────────────────────────────────────────────────────
 
 export default function ProjektekSection() {
-  const [selectedProject, setSelectedProject] = useState<DemoProject | null>(null)
-  const [createOpen,      setCreateOpen]      = useState(false)
+  const [savedProjects, setSaved] = useState<SavedProject[]>([])
+  const [selectedCard,  setSelected] = useState<CardData | null>(null)
+  const [createOpen,    setCreate]   = useState(false)
+
+  // Poll localStorage on mount + when tab gains focus
+  useEffect(() => {
+    const load = () => setSaved(loadSavedProjects())
+    load()
+    window.addEventListener('focus', load)
+    return () => window.removeEventListener('focus', load)
+  }, [])
+
+  const savedCards: CardData[] = savedProjects.map(savedToCard)
+  const demoCards:  CardData[] = DEMO_PROJECTS.map(d => ({ ...d, savedProject: undefined }))
+  const hasSaved = savedCards.length > 0
 
   return (
     <div className="animate-fade-up">
@@ -101,50 +112,73 @@ export default function ProjektekSection() {
               Projektjeim
             </h2>
             <p className="text-sm leading-relaxed max-w-xl" style={{ color: 'var(--tx-muted)' }}>
-              Mentett építkezések, felújítások és későbbi szakember-hozzáférések egy helyen.
+              Mentett építkezések, felújítások és később szakember-hozzáférések egy helyen.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
+          <button type="button" onClick={() => setCreate(true)}
             className="flex items-center gap-2 text-sm font-semibold rounded-2xl px-5 py-2.5 text-white transition-all hover:scale-[1.02] shrink-0"
-            style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 3px 10px rgba(74,124,89,.22)' }}
-          >
+            style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 3px 10px rgba(74,124,89,.22)' }}>
             + Új projekt
           </button>
         </div>
       </div>
 
-      {/* Demo notice */}
-      <div className="rounded-2xl px-4 py-3 mb-6 border flex gap-2.5 items-start"
-        style={{ background: '#F5F0E8', borderColor: '#D4C4A8' }}>
-        <span className="shrink-0 text-sm mt-px">ℹ️</span>
-        <p className="text-[11px] leading-relaxed" style={{ color: '#5C4A2A' }}>
-          Ez egy demó projekt-dashboard. A megjelenített projektek fiktív adatok — az éles
-          verzióban a saját mentett projektjeid jelennének meg itt.
-        </p>
-      </div>
+      {/* ── SAVED projects (primary) ── */}
+      {hasSaved ? (
+        <>
+          <p className="section-label mb-4">Mentett projektek ({savedCards.length})</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {savedCards.map(card => (
+              <ProjectCard key={card.id} card={card} onOpen={() => setSelected(card)} />
+            ))}
+          </div>
 
-      {/* Project cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        {DEMO_PROJECTS.map(project => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onOpen={() => setSelectedProject(project)}
-          />
-        ))}
-      </div>
+          {/* Demo section collapsed below */}
+          <details className="mb-8 group">
+            <summary className="cursor-pointer text-xs font-semibold select-none flex items-center gap-2 mb-3"
+              style={{ color: 'var(--tx-muted)', listStyle: 'none' }}>
+              <span className="transition-transform group-open:rotate-90">▶</span>
+              Demó projektek (nem valós adatok)
+            </summary>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {demoCards.map(card => (
+                <ProjectCard key={card.id} card={card} onOpen={() => setSelected(card)} />
+              ))}
+            </div>
+          </details>
+        </>
+      ) : (
+        <>
+          {/* Empty real state + demo section */}
+          <div className="rounded-2xl px-5 py-4 mb-6 border flex items-start gap-3"
+            style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+            <span className="text-lg mt-px">💡</span>
+            <div>
+              <p className="text-sm font-medium mb-0.5" style={{ color: 'var(--tx-primary)' }}>
+                Még nincs mentett projekted
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+                Töltsd ki a kalkulátort és kattints a „Mentés" gombra — a projekt azonnal megjelenik itt.
+                Alul demó projekteket látsz példaként.
+              </p>
+            </div>
+          </div>
+
+          <p className="section-label mb-4">Demó projektek (nem valós adatok)</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+            {demoCards.map(card => (
+              <ProjectCard key={card.id} card={card} onOpen={() => setSelected(card)} />
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Modals */}
-      {selectedProject && (
-        <ProjectDetailModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
+      {selectedCard && (
+        <ProjectDetailModal card={selectedCard} onClose={() => setSelected(null)} />
       )}
       {createOpen && (
-        <CreateProjectModal onClose={() => setCreateOpen(false)} />
+        <CreateProjectModal onClose={() => setCreate(false)} />
       )}
     </div>
   )
@@ -152,72 +186,60 @@ export default function ProjektekSection() {
 
 // ── Project card ──────────────────────────────────────────────────────────
 
-function ProjectCard({ project, onOpen }: { key?: string; project: DemoProject; onOpen: () => void }) {
-  const sty = STATUS_STYLES[project.statusColor]
+function ProjectCard({ card, onOpen }: { key?: string; card: CardData; onOpen: () => void }) {
+  const sty = STATUS_STYLES[card.statusColor]
   return (
-    <div className="card p-5 flex flex-col gap-4 transition-all hover:scale-[1.01]">
-      {/* Header */}
+    <div className="card p-5 flex flex-col gap-3.5 transition-all hover:scale-[1.01]">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-9 h-9 rounded-2xl flex items-center justify-center text-xl shrink-0"
-            style={{ background: 'var(--surface-subtle)' }}>
-            {project.icon}
-          </div>
+            style={{ background: 'var(--surface-subtle)' }}>{card.icon}</div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold leading-snug truncate" style={{ color: 'var(--tx-primary)' }}>
-              {project.name}
-            </p>
-            <p className="text-[11px] mt-0.5" style={{ color: 'var(--tx-muted)' }}>
-              {project.type}
-            </p>
+            <p className="text-sm font-semibold leading-snug truncate" style={{ color: 'var(--tx-primary)' }}>{card.name}</p>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--tx-muted)' }}>{card.type}</p>
           </div>
         </div>
         <span className="shrink-0 text-[10px] font-semibold rounded-full px-2.5 py-1 border whitespace-nowrap"
           style={{ background: sty.bg, borderColor: sty.border, color: sty.color }}>
-          {project.status}
+          {card.status}
         </span>
       </div>
 
-      {/* Location */}
-      <p className="text-[11px] flex items-center gap-1.5" style={{ color: 'var(--tx-muted)' }}>
-        <span>📍</span>{project.location}
-      </p>
+      {card.location && (
+        <p className="text-[11px] flex items-center gap-1.5 -mt-1" style={{ color: 'var(--tx-muted)' }}>
+          <span>📍</span>{card.location}
+        </p>
+      )}
 
       {/* Progress */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--tx-muted)' }}>
-            Haladás
-          </p>
-          <p className="text-[10px] font-bold" style={{ color: 'var(--sage)' }}>{project.progress}%</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--tx-muted)' }}>Haladás</p>
+          <p className="text-[10px] font-bold" style={{ color: 'var(--sage)' }}>{card.progress}%</p>
         </div>
         <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface-subtle)' }}>
-          <div className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${project.progress}%`, background: 'var(--sage)' }} />
+          <div className="h-full rounded-full" style={{ width: `${card.progress}%`, background: 'var(--sage)' }} />
         </div>
       </div>
 
-      {/* Next milestone */}
-      <div className="rounded-xl px-3 py-2.5 border-l-2 text-[11px]"
-        style={{ background: 'var(--surface-subtle)', borderLeftColor: 'var(--sage)', color: 'var(--tx-secondary)' }}>
-        <span className="font-medium">Következő:</span> {project.nextMilestone}
-      </div>
+      {card.nextMilestone && (
+        <div className="rounded-xl px-3 py-2.5 border-l-2 text-[11px]"
+          style={{ background: 'var(--surface-subtle)', borderLeftColor: 'var(--sage)', color: 'var(--tx-secondary)' }}>
+          <span className="font-medium">Következő:</span> {card.nextMilestone}
+        </div>
+      )}
 
-      {/* Budget + CTA */}
       <div className="flex items-center justify-between mt-auto pt-3 border-t gap-2"
         style={{ borderColor: 'var(--border)' }}>
-        <div>
+        <div className="min-w-0">
           <p className="text-[10px]" style={{ color: 'var(--tx-muted)' }}>Becsült keret</p>
-          <p className="text-xs font-semibold tabular-nums" style={{ color: 'var(--tx-primary)' }}>
-            {project.budget}
+          <p className="text-xs font-semibold truncate" style={{ color: 'var(--tx-primary)' }}>
+            {card.budget ?? '–'}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onOpen}
-          className="text-xs font-semibold rounded-xl px-3.5 py-2 border transition-all hover:scale-[1.02]"
-          style={{ borderColor: 'var(--sage-border)', background: 'var(--sage-light)', color: 'var(--sage)' }}
-        >
+        <button type="button" onClick={onOpen}
+          className="text-xs font-semibold rounded-xl px-3.5 py-2 border transition-all hover:scale-[1.02] shrink-0"
+          style={{ borderColor: 'var(--sage-border)', background: 'var(--sage-light)', color: 'var(--sage)' }}>
           Megnyitás →
         </button>
       </div>
@@ -225,11 +247,11 @@ function ProjectCard({ project, onOpen }: { key?: string; project: DemoProject; 
   )
 }
 
-// ── Project detail modal ───────────────────────────────────────────────────
+// ── Project detail modal ──────────────────────────────────────────────────
 
-function ProjectDetailModal({ project, onClose }: { project: DemoProject; onClose: () => void }) {
+function ProjectDetailModal({ card, onClose }: { card: CardData; onClose: () => void }) {
   const [ctaToast, setCtaToast] = useState('')
-  const sty = STATUS_STYLES[project.statusColor]
+  const sty = STATUS_STYLES[card.statusColor]
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -238,68 +260,50 @@ function ProjectDetailModal({ project, onClose }: { project: DemoProject; onClos
     return () => { window.removeEventListener('keydown', fn); document.body.style.overflow = '' }
   }, [onClose])
 
-  function showCta(label: string) {
-    setCtaToast(label)
-    setTimeout(() => setCtaToast(''), 2500)
-  }
+  function showCta(label: string) { setCtaToast(label); setTimeout(() => setCtaToast(''), 2500) }
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,.45)', backdropFilter: 'blur(5px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div
-        className="w-full sm:max-w-2xl flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
-        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '92dvh' }}
-      >
+    <Modal isOpen={true} onClose={onClose} size="lg">
+      <div className="w-full max-w-2xl flex flex-col rounded-3xl overflow-hidden"
+        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '90dvh' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0"
-          style={{ borderColor: 'var(--border)' }}>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{project.icon}</span>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>{project.name}</p>
-              <p className="text-[11px]" style={{ color: 'var(--tx-muted)' }}>{project.type} · {project.location}</p>
+        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-2xl">{card.icon}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate" style={{ color: 'var(--tx-primary)' }}>{card.name}</p>
+              <p className="text-[11px]" style={{ color: 'var(--tx-muted)' }}>
+                {card.type}{card.location ? ` · ${card.location}` : ''}
+              </p>
             </div>
-            <span className="text-[10px] font-semibold rounded-full px-2.5 py-1 border"
-              style={{ background: sty.bg, borderColor: sty.border, color: sty.color }}>
-              {project.status}
-            </span>
+            <span className="text-[10px] font-semibold rounded-full px-2.5 py-1 border shrink-0"
+              style={{ background: sty.bg, borderColor: sty.border, color: sty.color }}>{card.status}</span>
           </div>
-          <button onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all hover:scale-105"
-            style={{ borderColor: 'var(--border)', color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </button>
+          <ModalCloseBtn onClose={onClose} />
         </div>
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-5">
-
-          {/* Progress strip */}
+          {/* Progress */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--tx-muted)' }}>
-                Projekt haladás
-              </p>
-              <p className="text-sm font-bold" style={{ color: 'var(--sage)' }}>{project.progress}%</p>
+              <p className="section-label">Projekt haladás</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--sage)' }}>{card.progress}%</p>
             </div>
             <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-subtle)' }}>
-              <div className="h-full rounded-full" style={{ width: `${project.progress}%`, background: 'var(--sage)' }} />
+              <div className="h-full rounded-full" style={{ width: `${card.progress}%`, background: 'var(--sage)' }} />
             </div>
-            <p className="text-[11px] mt-1.5" style={{ color: 'var(--tx-muted)' }}>
-              Következő mérföldkő: <span className="font-medium" style={{ color: 'var(--tx-primary)' }}>{project.nextMilestone}</span>
-            </p>
+            {card.nextMilestone && (
+              <p className="text-[11px] mt-1.5" style={{ color: 'var(--tx-muted)' }}>
+                Következő mérföldkő: <span className="font-medium" style={{ color: 'var(--tx-primary)' }}>{card.nextMilestone}</span>
+              </p>
+            )}
           </div>
 
           {/* Preview blocks */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {DETAIL_BLOCKS.map(b => (
-              <div key={b.title} className="rounded-2xl p-4 border"
-                style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+              <div key={b.title} className="rounded-2xl p-4 border" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-base">{b.icon}</span>
                   <p className="text-xs font-semibold" style={{ color: 'var(--tx-primary)' }}>{b.title}</p>
@@ -309,36 +313,28 @@ function ProjectDetailModal({ project, onClose }: { project: DemoProject; onClos
             ))}
           </div>
 
-          {/* CTA buttons */}
+          {/* CTAs */}
           <div className="flex flex-wrap gap-2">
-            {[
-              { label: 'Ütemterv megtekintése', icon: '⏱️' },
-              { label: 'Szakember hozzáadása', icon: '👷' },
-              { label: 'Anyaglista előnézet', icon: '🧱' },
-            ].map(cta => (
-              <button key={cta.label} type="button" onClick={() => showCta(cta.label)}
+            {['Ütemterv megtekintése', 'Szakember hozzáadása', 'Anyaglista előnézet'].map(cta => (
+              <button key={cta} type="button" onClick={() => showCta(cta)}
                 className="flex items-center gap-1.5 text-xs font-semibold rounded-xl px-4 py-2 border transition-all hover:scale-[1.02]"
                 style={{ borderColor: 'var(--sage-border)', background: 'var(--sage-light)', color: 'var(--sage)' }}>
-                {cta.icon} {cta.label}
+                {cta}
               </button>
             ))}
           </div>
-
           {ctaToast && (
-            <p className="text-[11px] text-center animate-fade-in rounded-xl py-2 border"
+            <p className="text-[11px] text-center rounded-xl py-2 border"
               style={{ color: 'var(--sage)', background: 'var(--sage-light)', borderColor: 'var(--sage-border)' }}>
               Az éles verzióban a „{ctaToast}" funkció elérhető lesz.
             </p>
           )}
 
-          {/* Role access section */}
+          {/* Roles */}
           <div>
-            <p className="text-sm font-semibold mb-1" style={{ color: 'var(--tx-primary)' }}>
-              Hozzáférések előnézete
-            </p>
+            <p className="text-sm font-semibold mb-1" style={{ color: 'var(--tx-primary)' }}>Hozzáférések előnézete</p>
             <p className="text-[11px] leading-relaxed mb-3" style={{ color: 'var(--tx-muted)' }}>
-              Az éles verzióban a tulajdonos, projektmenedzser, generálkivitelező vagy
-              szakági szakember eltérő jogosultságokkal férhet hozzá a projekthez.
+              Az éles verzióban minden szerepkör eltérő jogosultságokkal férhet hozzá a projekthez.
             </p>
             <div className="grid grid-cols-2 gap-2">
               {ROLE_CARDS.map(r => (
@@ -353,20 +349,19 @@ function ProjectDetailModal({ project, onClose }: { project: DemoProject; onClos
               ))}
             </div>
           </div>
-
         </div>
 
         {/* Footer */}
         <div className="px-6 py-4 border-t shrink-0 flex justify-end"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-subtle)' }}>
           <button onClick={onClose}
-            className="text-xs font-medium rounded-xl px-4 py-2 border transition-all"
+            className="text-xs font-medium rounded-xl px-4 py-2 border"
             style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface)' }}>
             Bezárás
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }
 
@@ -387,29 +382,15 @@ function CreateProjectModal({ onClose }: { onClose: () => void }) {
   }, [onClose])
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,.45)', backdropFilter: 'blur(5px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div
-        className="w-full sm:max-w-md flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
-        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '90dvh' }}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0"
-          style={{ borderColor: 'var(--border)' }}>
+    <Modal isOpen={true} onClose={onClose} size="lg">
+      <div className="w-full max-w-md flex flex-col rounded-3xl overflow-hidden"
+        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '90dvh' }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
           <div>
             <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Új projekt létrehozása</p>
             <p className="text-[11px]" style={{ color: 'var(--tx-muted)' }}>Frontend-only demó</p>
           </div>
-          <button onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all hover:scale-105"
-            style={{ borderColor: 'var(--border)', color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </button>
+          <ModalCloseBtn onClose={onClose} />
         </div>
 
         <div className="overflow-y-auto flex-1 px-6 py-5">
@@ -418,21 +399,18 @@ function CreateProjectModal({ onClose }: { onClose: () => void }) {
               <div className="w-14 h-14 rounded-3xl flex items-center justify-center text-2xl border"
                 style={{ background: 'var(--sage-light)', borderColor: 'var(--sage-border)' }}>✅</div>
               <div>
-                <p className="text-base font-semibold mb-1.5" style={{ color: 'var(--tx-primary)' }}>
-                  Demo projekt létrehozva
-                </p>
+                <p className="text-base font-semibold mb-1.5" style={{ color: 'var(--tx-primary)' }}>Demo projekt létrehozva</p>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
                   Az éles verzióban ez a fiókodban mentésre kerül.
                 </p>
               </div>
-              <div className="w-full rounded-2xl p-4 border text-left"
-                style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+              <div className="w-full rounded-2xl p-4 border text-left" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
                 <p className="text-[11px]" style={{ color: 'var(--tx-muted)' }}>
                   ℹ️ Ez frontend-only demó. Valódi mentés később backend bekötéssel működik majd.
                 </p>
               </div>
               <button onClick={onClose}
-                className="text-sm font-medium rounded-xl px-5 py-2.5 border transition-all"
+                className="text-sm font-medium rounded-xl px-5 py-2.5 border"
                 style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface-subtle)' }}>
                 Bezárás
               </button>
@@ -442,37 +420,27 @@ function CreateProjectModal({ onClose }: { onClose: () => void }) {
               <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
                 Az éles verzióban itt menthető lesz az új építkezés vagy felújítás projektként.
               </p>
-
               <Field label="Projekt neve">
                 <input className="field-input" value={name} placeholder="pl. Napliget Ház"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)} />
               </Field>
-
               <Field label="Projekt típusa">
                 <div className="relative">
-                  <select className="field-input pr-10 appearance-none"
-                    style={{ WebkitAppearance: 'none', fontFamily: 'inherit' }}
+                  <select className="field-input pr-10 appearance-none" style={{ WebkitAppearance: 'none', fontFamily: 'inherit' }}
                     value={type} onChange={(e: ChangeEvent<HTMLSelectElement>) => setType(e.target.value)}>
                     <option value="">Válasszon…</option>
-                    <option>Lakásfelújítás</option>
-                    <option>Családi ház építés</option>
-                    <option>Fürdőszoba felújítás</option>
-                    <option>Bővítés</option>
+                    <option>Lakásfelújítás</option><option>Családi ház építés</option>
+                    <option>Fürdőszoba felújítás</option><option>Bővítés</option>
                   </select>
-                  <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2"
-                    style={{ color: 'var(--tx-muted)' }}>
-                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
-                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
+                  <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--tx-muted)' }}>
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </div>
                 </div>
               </Field>
-
               <Field label="Lokáció">
                 <input className="field-input" value={location} placeholder="pl. Budapest, Győr…"
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)} />
               </Field>
-
               <Field label="Kezdési dátum">
                 <input type="date" className="field-input" value={startDate}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)} />
@@ -497,11 +465,10 @@ function CreateProjectModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   )
 }
 
-// ── Tiny helper ────────────────────────────────────────────────────────────
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

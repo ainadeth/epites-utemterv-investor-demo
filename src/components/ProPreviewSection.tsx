@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { Modal, ModalCloseBtn } from './ui/Modal'
 
 // ── Pro feature card data ─────────────────────────────────────────────────
 
@@ -38,42 +39,117 @@ const PRO_CARDS: ProCard[] = [
 // ── Sample Pro modal content — project-type-aware ─────────────────────────
 
 type SampleKind = 'tags' | 'bullets' | 'warnings' | 'checklist'
-interface SampleSection { title: string; icon: string; items: string[]; kind: SampleKind }
-interface ProSampleData { phase: string; sections: SampleSection[] }
+
+interface SampleSection {
+  title: string
+  icon: string
+  items: string[]
+  kind: SampleKind
+}
+
+interface ProSampleData {
+  phase: string
+  sections: SampleSection[]
+}
 
 const PRO_SAMPLE_HAZEPITES: ProSampleData = {
   phase: 'Tetőszerkezet',
   sections: [
-    { title: 'Szükséges szakemberek', icon: '👷', kind: 'tags',
-      items: ['Ács', 'Tetőfedő', 'Bádogos', 'Statikus / műszaki ellenőr (ha szükséges)'] },
-    { title: 'Előfeltételek', icon: '✅', kind: 'bullets',
-      items: ['Teherhordó falak elkészültek', 'Koszorú elkészült', 'Beton/koszorú megfelelően kötött', 'Tervrajz és méretek rendelkezésre állnak', 'Faanyag előkészítve'] },
-    { title: 'Mire épül?', icon: '🏗️', kind: 'bullets',
-      items: ['Falazás', 'Koszorú', 'Födém', 'Statikai és építészeti tervek'] },
-    { title: 'Mi követi?', icon: '➡️', kind: 'bullets',
-      items: ['Tetőfólia', 'Lécezés', 'Tetőfedés', 'Bádogozás', 'Ereszcsatorna'] },
-    { title: 'Tipikus hibák', icon: '⚠️', kind: 'warnings',
-      items: ['Pontatlan méretezés', 'Nem megfelelő faanyagvédelem', 'Elhamarkodott munkakezdés', 'Rossz vízelvezetési kialakítás'] },
-    { title: 'Ellenőrzőlista', icon: '☑️', kind: 'checklist',
-      items: ['Tervrajz ellenőrizve', 'Anyag megrendelve', 'Szakember egyeztetve', 'Koszorú ellenőrizve', 'Időjárási kockázat átgondolva'] },
+    {
+      title: 'Szükséges szakemberek',
+      icon: '👷',
+      kind: 'tags',
+      items: ['Ács', 'Tetőfedő', 'Bádogos', 'Statikus / műszaki ellenőr (ha szükséges)'],
+    },
+    {
+      title: 'Előfeltételek',
+      icon: '✅',
+      kind: 'bullets',
+      items: [
+        'Teherhordó falak elkészültek',
+        'Koszorú elkészült',
+        'Beton/koszorú megfelelően kötött',
+        'Tervrajz és méretek rendelkezésre állnak',
+        'Faanyag előkészítve',
+      ],
+    },
+    {
+      title: 'Mire épül?',
+      icon: '🏗️',
+      kind: 'bullets',
+      items: ['Falazás', 'Koszorú', 'Födém', 'Statikai és építészeti tervek'],
+    },
+    {
+      title: 'Mi követi?',
+      icon: '➡️',
+      kind: 'bullets',
+      items: ['Tetőfólia', 'Lécezés', 'Tetőfedés', 'Bádogozás', 'Ereszcsatorna'],
+    },
+    {
+      title: 'Tipikus hibák',
+      icon: '⚠️',
+      kind: 'warnings',
+      items: ['Pontatlan méretezés', 'Nem megfelelő faanyagvédelem', 'Elhamarkodott munkakezdés', 'Rossz vízelvezetési kialakítás'],
+    },
+    {
+      title: 'Ellenőrzőlista',
+      icon: '☑️',
+      kind: 'checklist',
+      items: ['Tervrajz ellenőrizve', 'Anyag megrendelve', 'Szakember egyeztetve', 'Koszorú ellenőrizve', 'Időjárási kockázat átgondolva'],
+    },
   ],
 }
 
 const PRO_SAMPLE_FELUJITAS: ProSampleData = {
   phase: 'Burkolás',
   sections: [
-    { title: 'Szükséges szakemberek', icon: '👷', kind: 'tags',
-      items: ['Burkoló', 'Vízszigetelés szakember', 'Festő (szükség esetén)'] },
-    { title: 'Előfeltételek', icon: '✅', kind: 'bullets',
-      items: ['Bontás elkészült', 'Gépészeti és villanyos kiállások kész', 'Aljzat vízszintes és száraz', 'Vízszigetelés nedves helyiségben kész', 'Anyag megrendelve (+10% tartalékkal)'] },
-    { title: 'Mire épül?', icon: '🏗️', kind: 'bullets',
-      items: ['Bontás', 'Gépészet és villanyszerelés', 'Aljzat előkészítés', 'Vízszigetelés'] },
-    { title: 'Mi követi?', icon: '➡️', kind: 'bullets',
-      items: ['Festés és glettelés', 'Szaniterek és berendezések beépítése', 'Takarítás', 'Átadás'] },
-    { title: 'Tipikus hibák', icon: '⚠️', kind: 'warnings',
-      items: ['Vízszigetelés kihagyása nedves helyiségekben', 'Anyaghiány a munka közepén', 'Száradási idő be nem tartása', 'Aljzat egyenetlenségének figyelmen kívül hagyása'] },
-    { title: 'Ellenőrzőlista', icon: '☑️', kind: 'checklist',
-      items: ['Vízszigetelés kész és ellenőrzött', 'Csempe darabszám ellenőrizve', 'Ragasztó és fugázó megrendelve', 'Burkoló időpontja egyeztetve', 'Fugaszín kiválasztva'] },
+    {
+      title: 'Szükséges szakemberek',
+      icon: '👷',
+      kind: 'tags',
+      items: ['Burkoló', 'Vízszigetelés szakember', 'Festő (szükség esetén)'],
+    },
+    {
+      title: 'Előfeltételek',
+      icon: '✅',
+      kind: 'bullets',
+      items: [
+        'Bontás elkészült',
+        'Gépészeti és villanyos kiállások kész',
+        'Aljzat vízszintes és száraz',
+        'Vízszigetelés nedves helyiségben kész',
+        'Anyag megrendelve (+10% tartalékkal)',
+      ],
+    },
+    {
+      title: 'Mire épül?',
+      icon: '🏗️',
+      kind: 'bullets',
+      items: ['Bontás', 'Gépészet és villanyszerelés', 'Aljzat előkészítés', 'Vízszigetelés'],
+    },
+    {
+      title: 'Mi követi?',
+      icon: '➡️',
+      kind: 'bullets',
+      items: ['Festés és glettelés', 'Szaniterek és berendezések beépítése', 'Takarítás', 'Átadás'],
+    },
+    {
+      title: 'Tipikus hibák',
+      icon: '⚠️',
+      kind: 'warnings',
+      items: [
+        'Vízszigetelés kihagyása nedves helyiségekben',
+        'Anyaghiány a munka közepén',
+        'Száradási idő be nem tartása',
+        'Aljzat egyenetlenségének figyelmen kívül hagyása',
+      ],
+    },
+    {
+      title: 'Ellenőrzőlista',
+      icon: '☑️',
+      kind: 'checklist',
+      items: ['Vízszigetelés kész és ellenőrzött', 'Csempe darabszám ellenőrizve', 'Ragasztó és fugázó megrendelve', 'Burkoló időpontja egyeztetve', 'Fugaszín kiválasztva'],
+    },
   ],
 }
 
@@ -90,14 +166,10 @@ export default function ProPreviewSection({ projectKey }: { projectKey?: string 
 
   return (
     <>
-      {/* ── Section wrapper ── */}
       <section className="mt-8 mb-2 animate-fade-up">
-
-        {/* Section header */}
         <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
           <div>
             <div className="flex items-center gap-2.5 mb-2">
-              {/* Pro badge */}
               <span
                 className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full px-3 py-1 border"
                 style={{
@@ -122,34 +194,28 @@ export default function ProPreviewSection({ projectKey }: { projectKey?: string 
           </div>
         </div>
 
-        {/* 4 Pro cards — 2-col on md+, 1-col on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {PRO_CARDS.map((card) => (
-            <ProCard
+            <ProFeatureCard
               key={card.title}
               card={card}
               onPreview={() => setModalOpen(true)}
             />
           ))}
         </div>
-
       </section>
 
-      {/* ── Modal ── */}
-      {modalOpen && (
-        <ProModal onClose={() => setModalOpen(false)} sample={PRO_SAMPLE} />
-      )}
+      {modalOpen && <ProModal onClose={() => setModalOpen(false)} sample={PRO_SAMPLE} />}
     </>
   )
 }
 
 // ── Single locked Pro card ─────────────────────────────────────────────────
 
-function ProCard({
+function ProFeatureCard({
   card,
   onPreview,
 }: {
-  key?: string
   card: ProCard
   onPreview: () => void
 }) {
@@ -162,7 +228,6 @@ function ProCard({
         boxShadow: 'var(--shadow-card)',
       }}
     >
-      {/* Lock badge */}
       <span
         className="absolute top-4 right-4 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 border"
         style={{
@@ -174,7 +239,6 @@ function ProCard({
         <LockIcon size={10} /> Pro
       </span>
 
-      {/* Icon + title */}
       <div className="flex items-start gap-3 pr-16">
         <div
           className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0"
@@ -189,12 +253,10 @@ function ProCard({
         </div>
       </div>
 
-      {/* Description */}
       <p className="text-xs leading-relaxed flex-1" style={{ color: 'var(--tx-muted)' }}>
         {card.description}
       </p>
 
-      {/* CTA button */}
       <button
         type="button"
         onClick={onPreview}
@@ -216,36 +278,27 @@ function ProCard({
 // ── Modal ──────────────────────────────────────────────────────────────────
 
 function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleData }) {
-  const PRO_SAMPLE = sample
-  // Close on Escape key
   useEffect(() => {
-    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+
     window.addEventListener('keydown', fn)
+
     return () => window.removeEventListener('keydown', fn)
   }, [onClose])
 
-  // Prevent body scroll while open
   useEffect(() => {
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [])
 
   return (
-    /* Backdrop */
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      {/* Sheet */}
-      <div
-        className="relative w-full sm:max-w-2xl max-h-[92dvh] sm:max-h-[85vh] flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
-        style={{
-          background: 'var(--surface)',
-          boxShadow: '0 24px 64px rgba(0,0,0,.3)',
-        }}
-      >
-        {/* Header */}
+    <Modal isOpen={true} onClose={onClose} size="lg">
+      <div>
         <div
           className="flex items-center justify-between px-6 py-5 border-b shrink-0"
           style={{ borderColor: 'var(--border)' }}
@@ -260,7 +313,7 @@ function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleD
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>
-                  {PRO_SAMPLE.phase}
+                  {sample.phase}
                 </p>
                 <span
                   className="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 text-white"
@@ -275,29 +328,16 @@ function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleD
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 border shrink-0"
-            style={{
-              borderColor: 'var(--border)',
-              color: 'var(--tx-muted)',
-              background: 'var(--surface-subtle)',
-            }}
-            aria-label="Bezárás"
-          >
-            <CloseIcon />
-          </button>
+          <ModalCloseBtn onClose={onClose} />
         </div>
 
-        {/* Scrollable content */}
         <div className="overflow-y-auto flex-1 px-6 py-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PRO_SAMPLE.sections.map((section) => (
+            {sample.sections.map((section) => (
               <ModalSection key={section.title} section={section} />
             ))}
           </div>
 
-          {/* Disclaimer */}
           <div
             className="mt-5 rounded-2xl px-4 py-3 flex gap-2.5 items-start border"
             style={{
@@ -313,7 +353,6 @@ function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleD
           </div>
         </div>
 
-        {/* Footer */}
         <div
           className="px-6 py-4 border-t shrink-0 flex items-center justify-between gap-3 flex-wrap"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-subtle)' }}
@@ -334,7 +373,7 @@ function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleD
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }
 
@@ -349,7 +388,7 @@ interface Section {
   kind: SectionKind
 }
 
-function ModalSection({ section }: { key?: string; section: Section }) {
+function ModalSection({ section }: { section: Section }) {
   return (
     <div
       className="rounded-2xl p-4 border"
@@ -420,7 +459,6 @@ function SectionContent({ kind, items }: { kind: SectionKind; items: string[] })
     )
   }
 
-  // bullets (default)
   return (
     <ul className="flex flex-col gap-1.5">
       {items.map((item) => (
@@ -449,22 +487,20 @@ function LockIcon({ size = 12 }: { size?: number }) {
   )
 }
 
-function CloseIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 function CheckboxIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0 mt-0.5">
-      <rect x="1.5" y="1.5" width="11" height="11" rx="3" stroke="currentColor" strokeWidth="1.2"
-        style={{ stroke: '#93C5FD' }} />
+      <rect
+        x="1.5"
+        y="1.5"
+        width="11"
+        height="11"
+        rx="3"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        style={{ stroke: '#93C5FD' }}
+      />
       <path d="M4 7l2.5 2.5L10 4.5" stroke="#3B82F6" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
-
-

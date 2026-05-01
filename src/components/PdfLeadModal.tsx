@@ -225,15 +225,8 @@ export default function PdfLeadModal({ onClose, result, form }: Props) {
   const canExport = !!(result && form)
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div
-        className="relative w-full sm:max-w-md flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
-        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.3)', maxHeight: '90dvh' }}
-      >
+    <Modal isOpen={true} onClose={onClose} size="md">
+      <div>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-3">
@@ -336,7 +329,7 @@ export default function PdfLeadModal({ onClose, result, form }: Props) {
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   )
 }
 
@@ -351,3 +344,4 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 }
 
 import React from 'react'
+import { Modal } from './ui/Modal'

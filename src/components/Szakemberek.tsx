@@ -31,11 +31,12 @@ interface Props {
 
 // ── Main component ─────────────────────────────────────────────────────────
 export default function Szakemberek({ initialCategory, onCategoryConsumed }: Props) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
-  const [locationFilter, setLocationFilter] = useState('')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [initRole, setInitRole] = useState<RegistrationRole | ''>('')
-  const [fromPhase, setFromPhase] = useState(false)
+  const [selectedCategory,  setSelectedCategory]  = useState<string>('')
+  const [locationFilter,    setLocationFilter]     = useState('')
+  const [modalOpen,         setModalOpen]          = useState(false)
+  const [initRole,          setInitRole]           = useState<RegistrationRole | ''>('')
+  const [fromPhase,         setFromPhase]          = useState(false)
+  const [selectedProfile,   setSelectedProfile]    = useState<(typeof SAMPLE_PROFILES)[0] | null>(null)
 
   // Consume incoming category from Gantt navigation
   useEffect(() => {
@@ -137,9 +138,16 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
             return (
               <div key={profile.id} className="card p-5 flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--tx-primary)' }}>{profile.name}</p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--tx-muted)' }}>{profile.category} · {profile.location}</p>
+                  <div className="flex items-start gap-3 min-w-0">
+                    {/* Avatar */}
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xs font-bold shrink-0 select-none"
+                      style={{ background: profile.avatarBg, color: profile.avatarColor }}>
+                      {profile.avatarInitials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--tx-primary)' }}>{profile.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--tx-muted)' }}>{profile.category} · {profile.location}</p>
+                    </div>
                   </div>
                   <span className="shrink-0 text-[10px] font-semibold rounded-full px-2.5 py-1 border whitespace-nowrap"
                     style={{ background: bStyle.bg, borderColor: bStyle.border, color: bStyle.color }}>
@@ -172,9 +180,9 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
                       style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface-subtle)' }}>
                       Ajánlatkérés előnézet
                     </button>
-                    <button type="button" onClick={() => openAs('szakagi')}
+                    <button type="button" onClick={() => setSelectedProfile(profile)}
                       className="text-[11px] font-semibold rounded-xl px-2.5 py-1.5 border transition-all hover:scale-[1.02]"
-                      style={{ borderColor: '#93C5FD', background: '#EFF6FF', color: '#1D4ED8' }}>
+                      style={{ borderColor: 'var(--sage-border)', background: 'var(--sage-light)', color: 'var(--sage)' }}>
                       Profil megtekintése
                     </button>
                   </div>
@@ -227,6 +235,13 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
       </div>
 
       {modalOpen && <EarlyAccessModal initialRole={initRole} onClose={() => setModalOpen(false)} />}
+      {selectedProfile && (
+        <ProfileModal
+          profile={selectedProfile}
+          onClose={() => setSelectedProfile(null)}
+          onRequestQuote={() => { setSelectedProfile(null); openAs('szakagi') }}
+        />
+      )}
     </div>
   )
 }
@@ -264,10 +279,8 @@ function EarlyAccessModal({ initialRole, onClose }: { initialRole: RegistrationR
   const isPro = data.szerep !== '' && data.szerep !== 'epitkezo'
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: 'rgba(0,0,0,.55)', backdropFilter: 'blur(4px)' }}
-      onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="relative w-full sm:max-w-lg flex flex-col rounded-t-3xl sm:rounded-3xl overflow-hidden animate-fade-up"
+    <Modal isOpen={true} onClose={onClose} size="md">
+      <div className="relative w-full max-w-lg flex flex-col rounded-3xl overflow-hidden"
         style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.3)', maxHeight: '92dvh' }}>
         <div className="flex items-center justify-between px-6 py-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
           <div>
@@ -339,7 +352,7 @@ function EarlyAccessModal({ initialRole, onClose }: { initialRole: RegistrationR
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   )
 }
 
@@ -354,3 +367,135 @@ function F({ label, error, children }: { label: string; error?: string; children
 }
 
 import React from 'react'
+import { Modal } from './ui/Modal'
+
+// ── Profile preview modal ─────────────────────────────────────────────────
+
+function ProfileModal({
+  profile, onClose, onRequestQuote,
+}: {
+  profile: (typeof SAMPLE_PROFILES)[0]
+  onClose: () => void
+  onRequestQuote: () => void
+}) {
+  const bStyle = BADGE_STYLES[profile.badgeColor]
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', fn)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', fn); document.body.style.overflow = '' }
+  }, [onClose])
+
+  return (
+    <Modal isOpen={true} onClose={onClose} size="md">
+      <div
+        className="w-full max-w-lg flex flex-col rounded-3xl overflow-hidden"
+        style={{ background: 'var(--surface)', boxShadow: '0 24px 64px rgba(0,0,0,.22)', maxHeight: '90dvh' }}
+      >
+        {/* Header with large avatar */}
+        <div className="px-6 pt-6 pb-5 border-b shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-start gap-4">
+              {/* Large avatar */}
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold shrink-0 select-none"
+                style={{ background: profile.avatarBg, color: profile.avatarColor, fontSize: '18px', letterSpacing: '.02em' }}
+              >
+                {profile.avatarInitials}
+              </div>
+              <div>
+                <p className="text-base font-semibold" style={{ color: 'var(--tx-primary)' }}>{profile.name}</p>
+                <p className="text-sm" style={{ color: 'var(--tx-secondary)' }}>{profile.category}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--tx-muted)' }}>📍 {profile.location}</p>
+              </div>
+            </div>
+            <button onClick={onClose}
+              className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all hover:scale-105 shrink-0"
+              style={{ borderColor: 'var(--border)', color: 'var(--tx-muted)', background: 'var(--surface-subtle)' }}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
+          {/* Rating + badge */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span className="text-amber-400 text-sm">★</span>
+              <span className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>{profile.rating.toFixed(1)}</span>
+              <span className="text-xs" style={{ color: 'var(--tx-muted)' }}>· {profile.reviews} értékelés</span>
+            </div>
+            <span className="text-[10px] font-semibold rounded-full px-2.5 py-1 border"
+              style={{ background: bStyle.bg, borderColor: bStyle.border, color: bStyle.color }}>
+              {profile.badge}
+            </span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
+          {/* Bio */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--tx-muted)' }}>
+              Rövid bemutatkozás
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--tx-secondary)' }}>{profile.intro}</p>
+          </div>
+
+          {/* Specialties */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--tx-muted)' }}>Szakterületek</p>
+            <div className="flex flex-wrap gap-1.5">
+              {profile.specialties.map(s => (
+                <span key={s} className="text-[11px] rounded-lg px-2.5 py-1 border"
+                  style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)', color: 'var(--tx-secondary)' }}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Reference */}
+          <div className="rounded-2xl p-4 border-l-2"
+            style={{ background: 'var(--surface-subtle)', borderLeftColor: 'var(--sage)' }}>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--tx-muted)' }}>Demo referencia</p>
+            <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-secondary)' }}>{profile.reference}</p>
+          </div>
+
+          {/* Meta */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl p-3 border" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--tx-muted)' }}>Működési terület</p>
+              <p className="text-xs" style={{ color: 'var(--tx-primary)' }}>{profile.location}</p>
+            </div>
+            <div className="rounded-xl p-3 border" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--tx-muted)' }}>Elérhetőség</p>
+              <p className="text-xs" style={{ color: 'var(--tx-primary)' }}>{profile.availability}</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl p-3 border text-center" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+            <p className="text-[11px]" style={{ color: 'var(--tx-muted)' }}>
+              ℹ️ Ez demó profil. Valódi kapcsolatfelvétel az éles verzióban lesz elérhető.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t shrink-0 flex items-center justify-between gap-3"
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-subtle)' }}>
+          <button onClick={onClose}
+            className="text-xs font-medium rounded-xl px-4 py-2 border"
+            style={{ borderColor: 'var(--border)', color: 'var(--tx-secondary)', background: 'var(--surface)' }}>
+            Bezárás
+          </button>
+          <button onClick={onRequestQuote}
+            className="text-sm font-semibold rounded-xl px-5 py-2.5 text-white transition-all hover:scale-[1.02]"
+            style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 3px 10px rgba(74,124,89,.22)' }}>
+            Ajánlatkérés előnézet
+          </button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
