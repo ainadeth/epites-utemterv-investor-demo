@@ -100,6 +100,10 @@ export default function StrategicSection() {
             Buildmap nem csak kalkulátor, hanem belépési pont egy építőipari platformhoz:
             ütemterv, költség, szakemberek, anyagok és később projektmenedzsment egy rendszerben.
           </p>
+          <p className="text-xs leading-relaxed mt-2" style={{ color: 'var(--tx-muted)' }}>
+            A fiókalapú működés később lehetővé teszi a mentett projekteket,
+            szakember-hozzáféréseket, Pro csomagokat és projektmenedzsment irányt.
+          </p>
         </div>
 
         {/* ── 4 platform pillars ── */}

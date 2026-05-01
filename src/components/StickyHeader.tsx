@@ -7,6 +7,7 @@ import {
 } from '../utils/storageUtils'
 import { PROJECTS } from '../data/projects'
 import PdfLeadModal from './PdfLeadModal'
+import AccountModal from './AccountModal'
 
 // ── Tabs ────────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,8 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
   const [copied,         setCopied]     = useState(false)
   const [toast,          setToast]      = useState('')
   const [pdfModalOpen,   setPdfModal]   = useState(false)
+  const [accountOpen,    setAccount]    = useState(false)
+  const [demoLoggedIn,   setDemoLogin]  = useState(false)
   const saveRef  = useRef<HTMLDivElement>(null)
   const projRef  = useRef<HTMLDivElement>(null)
   const menuRef  = useRef<HTMLDivElement>(null)
@@ -187,6 +190,20 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
               <IconPdf /><span className="hidden xl:inline">PDF</span>
             </UtilBtn>
 
+            {/* Account */}
+            <button
+              type="button"
+              onClick={() => setAccount(true)}
+              className="flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-xs font-semibold border transition-all hover:scale-[1.02]"
+              style={{
+                borderColor: demoLoggedIn ? 'var(--sage-border)' : 'var(--border)',
+                background:  demoLoggedIn ? 'var(--sage-light)' : 'var(--surface-subtle)',
+                color:       demoLoggedIn ? 'var(--sage)' : 'var(--tx-secondary)',
+              }}
+            >
+              {demoLoggedIn ? '👤 Demo fiók' : 'Belépés'}
+            </button>
+
             <div className="h-4 w-px mx-0.5" style={{ background: 'var(--border-strong)' }} />
 
             {/* Theme */}
@@ -269,6 +286,7 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
       </div>
 
       {pdfModalOpen && <PdfLeadModal onClose={() => setPdfModal(false)} result={result} form={form} />}
+      {accountOpen  && <AccountModal onClose={() => setAccount(false)} onDemoLogin={() => setDemoLogin(true)} />}
     </>
   )
 }
