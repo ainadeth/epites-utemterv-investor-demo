@@ -123,8 +123,9 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
             onClick={() => switchTab('calculator')}
             className="flex items-center gap-2 group shrink-0"
           >
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-105 transition-transform duration-200">É</div>
-            <span className="font-semibold text-sm hidden lg:block" style={{ color: 'var(--tx-primary)' }}>Építkezés</span>
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-105 transition-transform duration-200"
+              style={{ background: '#4A7C59' }}>B</div>
+            <span className="font-semibold text-sm hidden lg:block" style={{ color: 'var(--tx-primary)' }}>Buildmap</span>
           </button>
 
           {/* Divider */}
@@ -174,7 +175,8 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSave()}
                     placeholder={PROJECTS[form.projectKey].label}
                   />
-                  <button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[.98] text-white text-sm font-semibold rounded-xl py-2.5 transition-all">Mentés</button>
+                  <button onClick={handleSave} className="w-full active:scale-[.98] text-white text-sm font-semibold rounded-xl py-2.5 transition-all"
+                    style={{ background: '#4A7C59' }}>Mentés</button>
                 </Dropdown>
               )}
             </div>

@@ -55,67 +55,163 @@ export default function PdfLeadModal({ onClose, result, form }: Props) {
     const projectLabel = PROJECTS[form.projectKey]?.label ?? form.projectKey
     const phaseRows = result.rows.filter((r): r is Extract<typeof r, {kind:'phase'}> => r.kind === 'phase' && !r.hidden)
     const budget = calcBudget(form.sizeM2, form.qualityKey, form.executionModeKey, form.complexityKey, form.projectKey)
+    const totalDays = result.totalDays || 1
+    const today = formatDate(new Date())
+
+    // Pastel bar colors cycling
+    const barColors = ['#A8C5B0','#7FB3C8','#C8B89A','#B0C5A8','#C8A87F','#A0B8C8','#BFC8A0']
+
+    // Build Gantt rows HTML
+    const ganttRows = phaseRows.map((r, i) => {
+      const offsetPct = Math.round((r.start.getTime() - result.projectStart.getTime()) / 86400000 / totalDays * 100)
+      const widthPct  = Math.max(1, Math.round(r.days / totalDays * 100))
+      const color = barColors[i % barColors.length]
+      return `<tr>
+        <td class="gantt-label">${r.num}. ${r.name}</td>
+        <td class="gantt-bar-cell">
+          <div class="gantt-track">
+            <div class="gantt-bar" style="margin-left:${offsetPct}%;width:${widthPct}%;background:${color};">
+              <span class="gantt-bar-label">${r.days}n</span>
+            </div>
+          </div>
+        </td>
+      </tr>`
+    }).join('')
+
+    // Budget breakdown rows
+    const budgetRows = budget.phaseCosts.map(p =>
+      `<tr><td>${p.label}</td><td>${p.pct}%</td><td>${formatFt(p.min)} – ${formatFt(p.max)}</td></tr>`
+    ).join('')
 
     const html = `<!DOCTYPE html>
 <html lang="hu">
 <head>
   <meta charset="UTF-8"/>
-  <title>Építkezési ütemterv – ${projectLabel}</title>
+  <title>Buildmap – ${projectLabel}</title>
   <style>
-    body { font-family: Arial, sans-serif; font-size: 13px; padding: 32px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
-    h1 { font-size: 20px; margin-bottom: 4px; }
-    .subtitle { color: #6b7280; margin-bottom: 24px; font-size: 12px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
-    .card-label { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #94a3b8; margin-bottom: 4px; }
-    .card-value { font-size: 15px; font-weight: 700; }
-    h2 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin: 24px 0 10px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-    th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: #94a3b8; padding: 8px 10px; border-bottom: 1.5px solid #e2e8f0; }
-    td { padding: 9px 10px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
-    .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; border-radius: 5px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
-    .disclaimer { margin-top: 32px; padding: 12px 16px; background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; font-size: 11px; color: #713f12; }
-    .demo-note { background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #991b1b; margin-bottom: 24px; }
-    @media print { @page { margin: 1.5cm; } }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; color: #1C1F1A; background: #fff; padding: 36px 40px; max-width: 860px; margin: 0 auto; }
+
+    /* Header */
+    .doc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid #E4E1DA; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 32px; height: 32px; background: #4A7C59; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+    .brand-name { font-size: 20px; font-weight: 700; color: #1C1F1A; letter-spacing: -.3px; }
+    .brand-tag { font-size: 11px; color: #4A7C59; font-style: italic; margin-top: 1px; }
+    .doc-meta { text-align: right; font-size: 11px; color: #9A9F94; line-height: 1.6; }
+    .doc-title { font-size: 13px; font-weight: 600; color: #4A5240; }
+
+    /* Demo banner */
+    .demo-banner { background: #FEF9EE; border: 1px solid #F0D580; border-radius: 8px; padding: 8px 14px; font-size: 10.5px; color: #8A6A10; margin-bottom: 24px; }
+
+    /* Summary cards */
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 28px; }
+    .card { background: #F6F5F1; border: 1px solid #E4E1DA; border-radius: 10px; padding: 12px 14px; }
+    .card-label { font-size: 9px; text-transform: uppercase; letter-spacing: .12em; color: #9A9F94; margin-bottom: 5px; }
+    .card-value { font-size: 14px; font-weight: 700; color: #1C1F1A; line-height: 1.2; }
+
+    /* Section headings */
+    h2 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #4A7C59; margin: 24px 0 10px; padding-bottom: 4px; border-bottom: 1px solid #C8DFD0; }
+
+    /* Gantt */
+    .gantt-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .gantt-table td { padding: 5px 0; vertical-align: middle; }
+    .gantt-label { width: 32%; font-size: 11px; color: #4A5240; padding-right: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gantt-bar-cell { width: 68%; }
+    .gantt-track { background: #F0EEE9; border-radius: 4px; height: 20px; position: relative; overflow: hidden; }
+    .gantt-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; position: absolute; top: 0; min-width: 3%; }
+    .gantt-bar-label { font-size: 9px; font-weight: 600; color: #fff; padding: 0 6px; white-space: nowrap; overflow: hidden; }
+
+    /* Phase table */
+    .phase-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 11px; }
+    .phase-table th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: #9A9F94; padding: 6px 8px; border-bottom: 1.5px solid #E4E1DA; }
+    .phase-table td { padding: 7px 8px; border-bottom: 1px solid #F0EEE9; }
+    .phase-table tr:last-child td { border-bottom: none; }
+    .dur-badge { display: inline-block; background: #C8DFD0; color: #2D5C3A; border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+
+    /* Budget */
+    .budget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .budget-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px; }
+    .budget-table th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: #9A9F94; padding: 6px 8px; border-bottom: 1.5px solid #E4E1DA; }
+    .budget-table td { padding: 6px 8px; border-bottom: 1px solid #F0EEE9; }
+    .budget-table tr:last-child td { border-bottom: none; }
+
+    /* Disclaimer */
+    .disclaimer { margin-top: 28px; padding: 12px 16px; background: #F6F5F1; border: 1px solid #E4E1DA; border-radius: 8px; font-size: 10.5px; color: #6A6F65; line-height: 1.6; }
+
+    @media print {
+      @page { margin: 1.2cm 1.5cm; size: A4; }
+      body { padding: 0; }
+      .demo-banner { display: none; }
+    }
   </style>
 </head>
 <body>
-  <h1>Építkezési ütemterv</h1>
-  <div class="subtitle">${projectLabel} · ${form.sizeM2} m² · Generálva: ${formatDate(new Date())}</div>
 
-  <div class="demo-note">
+  <!-- Header -->
+  <div class="doc-header">
+    <div class="brand">
+      <div class="brand-mark">B</div>
+      <div>
+        <div class="brand-name">Buildmap</div>
+        <div class="brand-tag">az építkezésed térképe.</div>
+      </div>
+    </div>
+    <div class="doc-meta">
+      <div class="doc-title">Építkezési ütemterv</div>
+      <div>${projectLabel} · ${form.sizeM2} m²</div>
+      <div>Generálva: ${today}</div>
+    </div>
+  </div>
+
+  <div class="demo-banner">
     ⚠️ Ez ideiglenes demó export. Az éles verzióban valódi PDF-generálás és e-mail küldés működik majd.
   </div>
 
-  <div class="grid">
+  <!-- Summary cards -->
+  <div class="cards">
     <div class="card"><div class="card-label">Kezdés</div><div class="card-value">${formatDate(result.projectStart)}</div></div>
     <div class="card"><div class="card-label">Várható befejezés</div><div class="card-value">${formatDate(result.projectEnd)}</div></div>
     <div class="card"><div class="card-label">Teljes időtartam</div><div class="card-value">${result.totalDays} nap</div></div>
+    <div class="card"><div class="card-label">Becsült keret</div><div class="card-value" style="font-size:11px;">${formatFt(budget.minTotal)}–${formatFt(budget.maxTotal)}</div></div>
   </div>
 
-  <h2>Fázisok</h2>
-  <table>
+  <!-- Gantt timeline -->
+  <h2>Fázis ütemterv — Gantt nézet</h2>
+  <table class="gantt-table"><tbody>${ganttRows}</tbody></table>
+
+  <!-- Phase table -->
+  <h2>Fázistáblázat</h2>
+  <table class="phase-table">
     <thead><tr><th>#</th><th>Fázis neve</th><th>Kezdés</th><th>Befejezés</th><th>Időtartam</th></tr></thead>
     <tbody>
       ${phaseRows.map(r => `<tr>
         <td>${r.num}</td><td>${r.name}</td>
         <td>${formatDate(r.start)}</td><td>${formatDate(r.end)}</td>
-        <td><span class="badge">${r.days} nap</span></td>
+        <td><span class="dur-badge">${r.days} nap</span></td>
       </tr>`).join('')}
     </tbody>
   </table>
 
+  <!-- Budget summary -->
   <h2>Becsült költségsáv</h2>
-  <div class="grid">
+  <div class="budget-grid">
     <div class="card"><div class="card-label">Minimum</div><div class="card-value">${formatFt(budget.minTotal)}</div></div>
     <div class="card"><div class="card-label">Maximum</div><div class="card-value">${formatFt(budget.maxTotal)}</div></div>
-    <div class="card"><div class="card-label">Ft/m²</div><div class="card-value">${Math.round(budget.minPerM2 / 1000)}–${Math.round(budget.maxPerM2 / 1000)} e. Ft</div></div>
+    <div class="card"><div class="card-label">Becsült Ft/m²</div><div class="card-value" style="font-size:12px;">${Math.round(budget.minPerM2/1000)}–${Math.round(budget.maxPerM2/1000)} e. Ft</div></div>
   </div>
+  <table class="budget-table">
+    <thead><tr><th>Fázis</th><th>%</th><th>Becsült sáv</th></tr></thead>
+    <tbody>${budgetRows}</tbody>
+  </table>
 
+  <!-- Disclaimer -->
   <div class="disclaimer">
     Az ütemterv és a költségsáv tájékoztató jellegű becslés. Nem garantált ár, nem ajánlat.
-    A tényleges időtartam és költség függ a kivitelezéstől, anyagáraktól és egyedi körülményektől.
+    A tényleges időtartam és költség függ a kivitelezéstől, anyagáraktól, engedélyezéstől
+    és egyedi körülményektől.
   </div>
+
 </body>
 </html>`
 

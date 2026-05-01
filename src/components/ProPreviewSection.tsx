@@ -35,90 +35,58 @@ const PRO_CARDS: ProCard[] = [
   },
 ]
 
-// ── Sample Pro modal content (Tetőszerkezet) ─────────────────────────────
+// ── Sample Pro modal content — project-type-aware ─────────────────────────
 
-const PRO_SAMPLE = {
+type SampleKind = 'tags' | 'bullets' | 'warnings' | 'checklist'
+interface SampleSection { title: string; icon: string; items: string[]; kind: SampleKind }
+interface ProSampleData { phase: string; sections: SampleSection[] }
+
+const PRO_SAMPLE_HAZEPITES: ProSampleData = {
   phase: 'Tetőszerkezet',
   sections: [
-    {
-      title: 'Szükséges szakemberek',
-      icon: '👷',
-      items: [
-        'Ács',
-        'Tetőfedő',
-        'Bádogos',
-        'Statikus / műszaki ellenőr (ha szükséges)',
-      ],
-      kind: 'tags' as const,
-    },
-    {
-      title: 'Előfeltételek',
-      icon: '✅',
-      items: [
-        'Teherhordó falak elkészültek',
-        'Koszorú elkészült',
-        'Beton/koszorú megfelelően kötött',
-        'Tervrajz és tetőszerkezeti méretek rendelkezésre állnak',
-        'Faanyag vagy tetőszerkezeti anyag előkészítve',
-      ],
-      kind: 'bullets' as const,
-    },
-    {
-      title: 'Mire épül?',
-      icon: '🏗️',
-      items: [
-        'Falazás',
-        'Koszorú',
-        'Födém vagy felső teherhordó szerkezet',
-        'Statikai és építészeti tervek',
-      ],
-      kind: 'bullets' as const,
-    },
-    {
-      title: 'Mi követi?',
-      icon: '➡️',
-      items: [
-        'Tetőfólia',
-        'Lécezés',
-        'Tetőfedés',
-        'Bádogozás',
-        'Ereszcsatorna',
-        'Később: nyílászárók és homlokzati munkák',
-      ],
-      kind: 'bullets' as const,
-    },
-    {
-      title: 'Tipikus hibák',
-      icon: '⚠️',
-      items: [
-        'Pontatlan méretezés',
-        'Nem megfelelő faanyagvédelem',
-        'Elhamarkodott munkakezdés nem megfelelő kötési idő után',
-        'Rossz vízelvezetési kialakítás',
-        'Szakágak rossz sorrendje',
-      ],
-      kind: 'warnings' as const,
-    },
-    {
-      title: 'Ellenőrzőlista',
-      icon: '☑️',
-      items: [
-        'Tervrajz ellenőrizve',
-        'Anyag megrendelve',
-        'Szakember időpontja egyeztetve',
-        'Koszorú állapota ellenőrizve',
-        'Rögzítési pontok ellenőrizve',
-        'Időjárási kockázat átgondolva',
-      ],
-      kind: 'checklist' as const,
-    },
+    { title: 'Szükséges szakemberek', icon: '👷', kind: 'tags',
+      items: ['Ács', 'Tetőfedő', 'Bádogos', 'Statikus / műszaki ellenőr (ha szükséges)'] },
+    { title: 'Előfeltételek', icon: '✅', kind: 'bullets',
+      items: ['Teherhordó falak elkészültek', 'Koszorú elkészült', 'Beton/koszorú megfelelően kötött', 'Tervrajz és méretek rendelkezésre állnak', 'Faanyag előkészítve'] },
+    { title: 'Mire épül?', icon: '🏗️', kind: 'bullets',
+      items: ['Falazás', 'Koszorú', 'Födém', 'Statikai és építészeti tervek'] },
+    { title: 'Mi követi?', icon: '➡️', kind: 'bullets',
+      items: ['Tetőfólia', 'Lécezés', 'Tetőfedés', 'Bádogozás', 'Ereszcsatorna'] },
+    { title: 'Tipikus hibák', icon: '⚠️', kind: 'warnings',
+      items: ['Pontatlan méretezés', 'Nem megfelelő faanyagvédelem', 'Elhamarkodott munkakezdés', 'Rossz vízelvezetési kialakítás'] },
+    { title: 'Ellenőrzőlista', icon: '☑️', kind: 'checklist',
+      items: ['Tervrajz ellenőrizve', 'Anyag megrendelve', 'Szakember egyeztetve', 'Koszorú ellenőrizve', 'Időjárási kockázat átgondolva'] },
   ],
+}
+
+const PRO_SAMPLE_FELUJITAS: ProSampleData = {
+  phase: 'Burkolás',
+  sections: [
+    { title: 'Szükséges szakemberek', icon: '👷', kind: 'tags',
+      items: ['Burkoló', 'Vízszigetelés szakember', 'Festő (szükség esetén)'] },
+    { title: 'Előfeltételek', icon: '✅', kind: 'bullets',
+      items: ['Bontás elkészült', 'Gépészeti és villanyos kiállások kész', 'Aljzat vízszintes és száraz', 'Vízszigetelés nedves helyiségben kész', 'Anyag megrendelve (+10% tartalékkal)'] },
+    { title: 'Mire épül?', icon: '🏗️', kind: 'bullets',
+      items: ['Bontás', 'Gépészet és villanyszerelés', 'Aljzat előkészítés', 'Vízszigetelés'] },
+    { title: 'Mi követi?', icon: '➡️', kind: 'bullets',
+      items: ['Festés és glettelés', 'Szaniterek és berendezések beépítése', 'Takarítás', 'Átadás'] },
+    { title: 'Tipikus hibák', icon: '⚠️', kind: 'warnings',
+      items: ['Vízszigetelés kihagyása nedves helyiségekben', 'Anyaghiány a munka közepén', 'Száradási idő be nem tartása', 'Aljzat egyenetlenségének figyelmen kívül hagyása'] },
+    { title: 'Ellenőrzőlista', icon: '☑️', kind: 'checklist',
+      items: ['Vízszigetelés kész és ellenőrzött', 'Csempe darabszám ellenőrizve', 'Ragasztó és fugázó megrendelve', 'Burkoló időpontja egyeztetve', 'Fugaszín kiválasztva'] },
+  ],
+}
+
+function getProSample(projectKey?: string): ProSampleData {
+  if (projectKey === 'felujitas') return PRO_SAMPLE_FELUJITAS
+  return PRO_SAMPLE_HAZEPITES
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function ProPreviewSection() {
+export default function ProPreviewSection({ projectKey }: { projectKey?: string }) {
   const [modalOpen, setModalOpen] = useState(false)
+  const PRO_SAMPLE = getProSample(projectKey)
 
   return (
     <>
@@ -133,7 +101,7 @@ export default function ProPreviewSection() {
               <span
                 className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest rounded-full px-3 py-1 border"
                 style={{
-                  background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)',
+                  background: 'linear-gradient(135deg, #3D6B4A 0%, #4A7C59 100%)',
                   borderColor: 'transparent',
                   color: '#fff',
                 }}
@@ -169,7 +137,7 @@ export default function ProPreviewSection() {
 
       {/* ── Modal ── */}
       {modalOpen && (
-        <ProModal onClose={() => setModalOpen(false)} />
+        <ProModal onClose={() => setModalOpen(false)} sample={PRO_SAMPLE} />
       )}
     </>
   )
@@ -232,10 +200,10 @@ function ProCard({
         onClick={onPreview}
         className="self-start inline-flex items-center gap-2 text-xs font-semibold rounded-xl px-4 py-2.5 border transition-all duration-150 hover:scale-[1.02] active:scale-[.98]"
         style={{
-          background: 'linear-gradient(135deg, #1D4ED8 0%, #4F46E5 100%)',
+          background: 'linear-gradient(135deg, #3D6B4A 0%, #4A7C59 100%)',
           borderColor: 'transparent',
           color: '#fff',
-          boxShadow: '0 2px 10px rgba(37,99,235,.3)',
+          boxShadow: '0 2px 10px rgba(74,124,89,.25)',
         }}
       >
         <LockIcon size={11} />
@@ -247,7 +215,8 @@ function ProCard({
 
 // ── Modal ──────────────────────────────────────────────────────────────────
 
-function ProModal({ onClose }: { onClose: () => void }) {
+function ProModal({ onClose, sample }: { onClose: () => void; sample: ProSampleData }) {
+  const PRO_SAMPLE = sample
   // Close on Escape key
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }

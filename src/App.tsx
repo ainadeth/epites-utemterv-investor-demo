@@ -155,7 +155,7 @@ export default function App() {
                 <PhaseDetailCards result={result} />
                 <BudgetSection form={form} />
                 <div id="pro-preview">
-                  <ProPreviewSection />
+                  <ProPreviewSection projectKey={form.projectKey} />
                 </div>
               </>
             )}

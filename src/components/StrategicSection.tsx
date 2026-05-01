@@ -96,6 +96,10 @@ export default function StrategicSection() {
             Egy döntéstámogató platform civil építkezőknek: idő, költség, fázisok,
             szakemberek és anyagbeszerzés egy helyen.
           </p>
+          <p className="text-sm leading-relaxed mt-2 font-medium" style={{ color: '#4A7C59' }}>
+            Buildmap nem csak kalkulátor, hanem belépési pont egy építőipari platformhoz:
+            ütemterv, költség, szakemberek, anyagok és később projektmenedzsment egy rendszerben.
+          </p>
         </div>
 
         {/* ── 4 platform pillars ── */}
