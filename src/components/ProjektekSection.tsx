@@ -90,7 +90,7 @@ export default function ProjektekSection() {
     <div className="animate-fade-up">
 
       {/* Hero */}
-      <div className="pt-12 pb-8">
+      <div className="page-top pb-8">
         <div className="flex items-end justify-between flex-wrap gap-4">
           <div>
             <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase rounded-full px-3.5 py-1.5 mb-4 border"

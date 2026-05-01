@@ -70,7 +70,7 @@ export default function StrategicSection() {
 
   return (
     <>
-      <section className="mt-16 mb-4 animate-fade-up">
+      <section className="page-top mb-4 animate-fade-up">
 
         {/* ── Section eyebrow ── */}
         <div className="flex items-center gap-3 mb-8">

@@ -39,7 +39,7 @@ function ProTabRedirect({ onGo }: { onGo: () => void }) {
 
 function ProEmptyState({ onGoToCalc }: { onGoToCalc: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 px-6 animate-fade-up">
+    <div className="page-top flex flex-col items-center justify-center text-center pb-20 px-6 animate-fade-up">
       <div className="w-20 h-20 rounded-3xl border-2 border-dashed flex items-center justify-center text-3xl mb-6"
         style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-subtle)' }}>
         📋

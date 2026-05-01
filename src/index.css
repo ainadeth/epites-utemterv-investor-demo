@@ -18,6 +18,9 @@
   --sage:             #4A7C59;
   --sage-light:       #E8F5EC;
   --sage-border:      #A8C5B0;
+
+  /* Header height: row-1 h-12 (48px) + row-2 h-9 (36px) = 84px */
+  --header-h:         84px;
   --sand:             #9A7A50;
   --mist:             #4A7090;
   --mist-light:       #E8F0F7;
@@ -101,6 +104,14 @@
     border: 3px solid var(--surface);
     box-shadow: 0 2px 8px rgba(74,124,89,.3);
     cursor: pointer;
+  }
+
+  /* ── Inner page offset — clears the sticky 2-row header ── */
+  .page-top {
+    padding-top: calc(var(--header-h) + 36px);  /* 84 + 36 = 120px */
+  }
+  .page-top-sm {
+    padding-top: calc(var(--header-h) + 20px);  /* 84 + 20 = 104px */
   }
 
   /* ── Scrollbar ── */

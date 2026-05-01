@@ -12,7 +12,7 @@ export default function HeroSection({ onGoToAnyagok }: Props) {
   ]
 
   return (
-    <section className="relative overflow-hidden pt-24 pb-14 text-center">
+    <section className="relative overflow-hidden pb-14 text-center" style={{ paddingTop: 'calc(var(--header-h) + 48px)' }}>
       {/* Ambient glow */}
       <div aria-hidden className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
         style={{ background: 'radial-gradient(ellipse at center, rgba(74,124,89,.10) 0%, transparent 65%)', filter: 'blur(40px)' }} />

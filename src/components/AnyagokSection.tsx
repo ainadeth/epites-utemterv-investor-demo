@@ -33,7 +33,7 @@ export default function AnyagokSection({ projectKey }: Props) {
     <div className="animate-fade-up">
 
       {/* ── Hero ── */}
-      <div className="pt-12 pb-8 text-center max-w-2xl mx-auto px-4">
+      <div className="page-top pb-8 text-center max-w-2xl mx-auto px-4">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase rounded-full px-3.5 py-1.5 mb-5 border"
           style={{ color: '#4A7C59', background: '#E8F5EC', borderColor: '#A8C5B0' }}>
           🧱 Anyagok és beszerzés

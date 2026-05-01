@@ -15,7 +15,7 @@ export default function FazisKalkulatorok() {
   return (
     <div className="animate-fade-up">
       {/* Section header */}
-      <div className="pt-10 pb-8 text-center max-w-2xl mx-auto px-4">
+      <div className="page-top pb-8 text-center max-w-2xl mx-auto px-4">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase text-blue-600 bg-blue-50 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-100 dark:border-blue-900/60 rounded-full px-3.5 py-1.5 mb-4">
           🔧 Fázis kalkulátorok
         </span>
