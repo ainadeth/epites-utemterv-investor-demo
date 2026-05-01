@@ -186,7 +186,7 @@ export default function App() {
         )}
 
         {/* ── Projektjeim dashboard ── */}
-        {activeTab === 'projektek' && <ProjektekSection />}
+        {activeTab === 'projektek' && <ProjektekSection onNavigate={handleTabChange} />}
 
         {/* ── Pro terv — shows empty state or scrolls to pro content ── */}
         {activeTab === 'pro' && (
