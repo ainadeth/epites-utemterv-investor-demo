@@ -56,8 +56,8 @@ function calcImpact(a: Answers) {
 
 function risk(impact: { time: number; cost: number }) {
   const s = impact.time + impact.cost
-  if (s <= 10) return { label: 'Alacsony', color: '#2D5C3A', bg: '#E8F5EC', border: '#A8C5B0' }
-  if (s <= 30) return { label: 'Közepes',  color: '#92400E', bg: '#FEF9EE', border: '#D4C4A8' }
+  if (s <= 9)  return { label: 'Alacsony', color: '#2D5C3A', bg: '#E8F5EC', border: '#A8C5B0' }
+  if (s <= 19) return { label: 'Közepes',  color: '#92400E', bg: '#FEF9EE', border: '#D4C4A8' }
   return             { label: 'Magas',    color: '#7F1D1D', bg: '#FEF2F2', border: '#FECACA' }
 }
 
