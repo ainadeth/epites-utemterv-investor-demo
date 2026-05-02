@@ -38,6 +38,13 @@ const ROADMAP = [
   { label: '11–12. hét', text: 'Pro csomag első fizetős ajánlata' },
 ]
 
+const VALIDATION_CARDS = [
+  { icon: '📊', title: 'Makroadatok',      text: 'KSH építési árak, lakásépítési költségmutatók és ÉVOSZ piaci visszajelzések.' },
+  { icon: '📐', title: 'Szakmai normák',   text: 'TERC / ÖN logikához hasonló normarendszeri megközelítés fázisidőkre és anyagigényre.' },
+  { icon: '🎙️', title: 'Primer validáció', text: 'Saját interjúk kivitelezőkkel, műszaki ellenőrökkel, szakemberekkel, tüzépekkel és építkezőkkel.' },
+  { icon: '📉', title: 'Bizonytalansági sáv', text: 'Minden becslés optimista / realista / kockázati sávot tartalmaz, nem egyetlen pontszámot.' },
+]
+
 const FUNDING_CARDS = [
   { icon: '⚙️', title: 'Termékfejlesztés',      text: 'Backend, fiókok, projekt-specifikus logika.' },
   { icon: '🎨', title: 'UX/UI és arculat',        text: 'Végleges brand, design system, animációk.' },
@@ -138,10 +145,60 @@ export default function StrategicSection() {
 
       <Divider />
 
-      {/* ── 2. Platform expansion ── */}
+      {/* ── 2. Calculation methodology ── */}
       <section className="mb-4">
         <SectionHeader
-          label="02 — Skálázás"
+          label="02 — Módszertan"
+          title="Validálható számítási modell"
+          subtitle="Az MVP jelenleg sávos becslést ad. A következő fejlesztési lépésben a fázisidők, költségsávok és szorzók szakmai interjúk, KSH/ÉVOSZ jellegű piaci adatok és TERC/ÖN logikához hasonló normarendszeri megközelítés alapján finomíthatók."
+        />
+        <div className="mb-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--tx-muted)' }}>Jelenlegi bemeneti paraméterek</p>
+          <div className="flex flex-wrap gap-2">
+            {['Projekttípus','Méret (m²)','Minőségi szint','Kivitelezési mód','Komplexitás','Műszaki állapot','Lokáció / régió','Projekt-specifikus kockázatok'].map(tag => (
+              <span key={tag} className="text-[11px] font-medium rounded-xl px-3 py-1.5 border"
+                style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)', color: 'var(--tx-secondary)' }}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <Grid cols={4}>
+          {VALIDATION_CARDS.map(c => <Card key={c.title} {...c} />)}
+        </Grid>
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { label: 'Időbecslés',    items: ['Optimista sáv','Realista sáv','Kockázati sáv'] },
+            { label: 'Költségsáv',   items: ['Alsó határ','Realista sáv','Tartalék sávval'] },
+            { label: 'Megbízhatóság',items: ['Bizonytalansági szint','Adatminőség jelzés','Javaslat szakértőre'] },
+          ].map(col => (
+            <div key={col.label} className="rounded-2xl p-4 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+              <p className="text-[10px] font-bold uppercase tracking-wider mb-2.5" style={{ color: 'var(--sage)' }}>{col.label}</p>
+              {col.items.map(item => (
+                <div key={item} className="flex items-center gap-2 py-1">
+                  <span className="w-1 h-1 rounded-full shrink-0" style={{ background: 'var(--sage)' }} />
+                  <span className="text-[11px]" style={{ color: 'var(--tx-secondary)' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 rounded-2xl px-5 py-3.5 border flex items-start gap-3"
+          style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+          <span className="text-sm shrink-0 mt-px">ℹ️</span>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+            A Buildmap célja döntéstámogató becslés, nem hivatalos költségvetés vagy kivitelezői ajánlat.
+            Az elvégzett kalkuláció tájékoztató jellegű, és nem helyettesíti a tételes szakmai felmérést.
+          </p>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* ── 3. Platform expansion ── */}
+      <section className="mb-4">
+        <SectionHeader
+          label="03 — Skálázás"
           title="Hogyan lesz ebből platform?"
           subtitle="A projektdata az ingyenes kalkulátortól a fiókalapú projektmenedzsmentig vezet."
         />
@@ -155,7 +212,7 @@ export default function StrategicSection() {
       {/* ── 3. Revenue ── */}
       <section className="mb-4">
         <SectionHeader
-          label="03 — Üzleti modell"
+          label="04 — Üzleti modell"
           title="Lehetséges bevételi lábak"
           subtitle="Több párhuzamos bevételi vonal, amelyek a projektalapú adatokra építenek."
         />
@@ -190,7 +247,7 @@ export default function StrategicSection() {
       {/* ── 4. Roadmap ── */}
       <section className="mb-4">
         <SectionHeader
-          label="04 — Roadmap"
+          label="05 — Roadmap"
           title="Következő 90 nap"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -214,7 +271,7 @@ export default function StrategicSection() {
       {/* ── 5. Funding use ── */}
       <section>
         <SectionHeader
-          label="05 — Következő forrás"
+          label="06 — Következő forrás"
           title="Mire kell a következő forrás?"
           subtitle="Az első befektetés a termék és az első fizető felhasználók megszerzésére irányul."
         />
