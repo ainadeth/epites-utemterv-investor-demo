@@ -56,7 +56,7 @@ function ProEmptyState({ onGoToCalc }: { onGoToCalc: () => void }) {
         type="button"
         onClick={onGoToCalc}
         className="text-sm font-semibold rounded-2xl px-6 py-3 text-white transition-all hover:scale-[1.02] active:scale-[.98]"
-        style={{ background: 'linear-gradient(135deg,#1D4ED8,#3B82F6)', boxShadow: '0 4px 14px rgba(37,99,235,.3)' }}
+        style={{ background: 'linear-gradient(135deg,#3D6B4A,#4A7C59)', boxShadow: '0 4px 14px rgba(74,124,89,.30)' }}
       >
         Vissza a fő kalkulátorhoz →
       </button>
@@ -162,7 +162,7 @@ export default function App() {
               </>
             )}
 
-            <CTASection />
+            <CTASection onNavigate={handleTabChange} />
           </>
         )}
 
