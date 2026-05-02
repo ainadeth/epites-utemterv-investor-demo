@@ -12,6 +12,7 @@ import InsightsPanel from './components/InsightsPanel'
 import RealityCheckPanel from './components/RealityCheckPanel'
 import PhaseDetailCards from './components/PhaseDetailCards'
 import BudgetSection from './components/BudgetSection'
+import EstimateRefinement from './components/EstimateRefinement'
 import ProPreviewSection from './components/ProPreviewSection'
 import FazisKalkulatorok from './components/FazisKalkulatorok'
 import Cikkek from './components/Cikkek'
@@ -159,6 +160,7 @@ export default function App() {
                 <RealityCheckPanel result={result} />
                 <PhaseDetailCards result={result} />
                 <BudgetSection form={form} />
+                <EstimateRefinement />
                 <div id="pro-preview">
                   <ProPreviewSection projectKey={form.projectKey} />
                 </div>
