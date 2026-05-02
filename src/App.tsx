@@ -137,7 +137,10 @@ export default function App() {
         {/* ── Fő kalkulátor ── */}
         {activeTab === 'calculator' && (
           <>
-            <HeroSection onGoToAnyagok={() => handleTabChange('anyagok')} />
+            <HeroSection
+                onGoToAnyagok={() => handleTabChange('anyagok')}
+                onGoToProjektek={() => handleTabChange('projektek')}
+              />
 
             <section id="calculator" className="mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">

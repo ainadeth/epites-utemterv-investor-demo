@@ -1,336 +1,228 @@
-import { useState } from 'react'
-import { EarlyAccessModal, type RegistrationRole } from './Szakemberek'
+// ── Befektetői vízió — Buildmap platform story ─────────────────────────────
 
-// ── Data — edit here to update content ────────────────────────────────────
+// ── Data ──────────────────────────────────────────────────────────────────
 
-const PLATFORM_PILLARS = [
-  {
-    icon: '⏱️',
-    title: 'Időtervezés',
-    text: 'Építési fázisok, becsült időtartamok, függőségek és várható csúszási pontok érthetően.',
-    color: '#3B82F6',
-    bg:    '#EFF6FF',
-  },
-  {
-    icon: '💰',
-    title: 'Költségbecslés',
-    text: 'Nagyságrendi költségsáv, minőségi szint, kockázati tényezők és pénzügyi döntéstámogatás.',
-    color: '#10B981',
-    bg:    '#ECFDF5',
-  },
-  {
-    icon: '👷',
-    title: 'Validált szakember-ökoszisztéma',
-    text: 'Kivitelezők, szakági szakemberek, műszaki ellenőrök, ügyvédek és finanszírozók későbbi előszűrt rendszere.',
-    color: '#8B5CF6',
-    bg:    '#F5F3FF',
-  },
-  {
-    icon: '🧱',
-    title: 'Anyagbeszerzési iránytű',
-    text: 'Fázisokhoz kötött anyaglista, tüzépek, márkák, akciók és beszerzési ajánlások későbbi integrációja.',
-    color: '#F59E0B',
-    bg:    '#FFFBEB',
-  },
+const MVP_CARDS = [
+  { icon: '⏱️', title: 'Ütemterv generálás',    text: 'Fázisok, határidők és csúszási kockázatok projekttípusonként.' },
+  { icon: '💰', title: 'Költségbecslés',          text: 'Projekttípus- és minőségi szint alapú sávos becslés.' },
+  { icon: '📄', title: 'PDF export',              text: 'Branded Gantt-ütemterv és költségbontás letölthető demóként.' },
+  { icon: '🧱', title: 'Anyaglogika',             text: 'Projekttípusonként releváns anyagkategóriák és időzítési útmutató.' },
+  { icon: '👷', title: 'Szakember modul',         text: 'Kategóriaszűrő, demó profilok, kapcsolatfelvétel-előnézet.' },
+  { icon: '📂', title: 'Projektjeim / fiókos irány', text: 'Mentett projektek, szerepkör-alapú hozzáférés prototípusa.' },
+  { icon: '📖', title: 'Cikkek / SEO tartalom',   text: 'Kalkulátor-cikkek és termékajánló demó — organikus forgalmi alap.' },
 ]
 
-const REVENUE_STREAMS = [
-  {
-    icon: '🔐',
-    title: 'Pro előfizetés',
-    text: 'Részletes terv, PDF export, naptár, checklist, anyaglista és mélyebb költségtervezés.',
-  },
-  {
-    icon: '🤝',
-    title: 'Szakember lead díj',
-    text: 'Ajánlatkérések közvetítése validált szakembereknek és szolgáltatóknak.',
-  },
-  {
-    icon: '🏷️',
-    title: 'Kiemelt partnermegjelenés',
-    text: 'Tüzépek, márkák, finanszírozók, ügyvédek és kivitelezők célzott megjelenése.',
-  },
-  {
-    icon: '🔗',
-    title: 'Affiliate / ajánlói jutalék',
-    text: 'Anyagbeszerzési ajánlások, termékajánlók és akciók későbbi monetizációja.',
-  },
+const PLATFORM_CARDS = [
+  { icon: '🗂️', title: 'Mentett projektek',           text: 'Fiókalapú projekttárhely tulajdonosnak, menedzsernek, kivitelezőnek.' },
+  { icon: '🧱', title: 'Projekt-specifikus anyaglista', text: 'Fázishoz kötött anyagigény, rendelési időzítés, partnerkapcsolat.' },
+  { icon: '👷', title: 'Szakember-hozzáférések',       text: 'Meghívható szereplők saját nézete: csak a saját fázisaik látszanak.' },
+  { icon: '📋', title: 'Dokumentumok & checklisták',   text: 'PDF-ek, tervek, fázisátvételi listák egy projektfelületen.' },
+  { icon: '✦',  title: 'Pro csomag',                   text: 'Részletes terv, naptár, emlékeztetők, exportok, projektmenedzsment.' },
+  { icon: '🏪', title: 'Marketplace / partneri ajánlatok', text: 'Tüzépek, szakemberek, finanszírozók és anyaggyártók célzott megjelenése.' },
 ]
 
-// ── Main component ─────────────────────────────────────────────────────────
+const REVENUE_CARDS = [
+  { icon: '💳', title: 'Pro előfizetés',            text: 'Részletes tervek, checklisták, exportok, naptár és projektmenedzsment.' },
+  { icon: '🔗', title: 'Szakember lead',             text: 'Validált szakembereknek érkező projektalapú megkeresések.' },
+  { icon: '📦', title: 'Anyagbeszerzési partnerlead', text: 'Tüzépek, boltok, gyártók és anyagkategóriák felé továbbított vásárlási szándék.' },
+  { icon: '📰', title: 'SEO / affiliate',            text: 'Cikkekből, kalkulátorokból és termékajánlókból érkező organikus forgalom.' },
+  { icon: '🤝', title: 'B2B / partneri csomagok',    text: 'Kivitelezőknek, projektmenedzsereknek, gyártóknak és pénzügyi partnereknek.' },
+]
 
-export default function StrategicSection() {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [initRole,  setInitRole]  = useState<RegistrationRole | ''>('')
+const ROADMAP = [
+  { label: '1–2. hét', text: 'Validáció szakmai szereplőkkel' },
+  { label: '3–4. hét', text: 'Kalkulátor pontosításának javítása' },
+  { label: '5–6. hét', text: 'Projekt-specifikus dashboard' },
+  { label: '7–8. hét', text: 'Lead capture bekötése' },
+  { label: '9–10. hét', text: 'Szakember és anyagpartner pilot' },
+  { label: '11–12. hét', text: 'Pro csomag első fizetős ajánlata' },
+]
 
-  function openModal(role: RegistrationRole | '') {
-    setInitRole(role)
-    setModalOpen(true)
-  }
+const FUNDING_CARDS = [
+  { icon: '⚙️', title: 'Termékfejlesztés',      text: 'Backend, fiókok, projekt-specifikus logika.' },
+  { icon: '🎨', title: 'UX/UI és arculat',        text: 'Végleges brand, design system, animációk.' },
+  { icon: '🏗️', title: 'Szakmai validáció',       text: 'Tesztelés kivitelezőkkel, műszaki ellenőrökkel, építészekkel.' },
+  { icon: '📖', title: 'Tartalom / SEO',          text: 'Cikk- és kalkulátortartalom, organikus növekedési alap.' },
+  { icon: '📣', title: 'Partneri értékesítés',    text: 'Szakember-, tüzép- és finanszírozói partnerkapcsolatok.' },
+  { icon: '🚀', title: 'Első pilotok',            text: 'Fizetős Pro és marketplace pilot valódi felhasználókkal.' },
+]
 
+// ── Sub-components ────────────────────────────────────────────────────────
+
+function SectionHeader({ label, title, subtitle }: { label: string; title: string; subtitle?: string }) {
   return (
-    <>
-      <section className="page-top mb-4 animate-fade-up">
-
-        {/* ── Section eyebrow ── */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
-          <span
-            className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border shrink-0"
-            style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--tx-muted)' }}
-          >
-            Termékjövőkép
-          </span>
-          <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
-        </div>
-
-        {/* ── Platform vision header ── */}
-        <div className="text-center max-w-2xl mx-auto mb-10 px-4">
-          <h2
-            className="font-serif text-2xl md:text-3xl font-medium mb-3 leading-snug"
-            style={{ color: 'var(--tx-primary)' }}
-          >
-            Több, mint építkezési kalkulátor
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-            Egy döntéstámogató platform civil építkezőknek: idő, költség, fázisok,
-            szakemberek és anyagbeszerzés egy helyen.
-          </p>
-          <p className="text-sm leading-relaxed mt-2 font-medium" style={{ color: '#4A7C59' }}>
-            Buildmap nem csak kalkulátor, hanem belépési pont egy építőipari platformhoz:
-            ütemterv, költség, szakemberek, anyagok és később projektmenedzsment egy rendszerben.
-          </p>
-          <p className="text-xs leading-relaxed mt-2" style={{ color: 'var(--tx-muted)' }}>
-            A fiókalapú működés később lehetővé teszi a mentett projekteket,
-            szakember-hozzáféréseket, Pro csomagokat és projektmenedzsment irányt.
-          </p>
-          <p className="text-xs leading-relaxed mt-1.5" style={{ color: 'var(--tx-muted)' }}>
-            A mentett projektek és szerepkör-alapú hozzáférések révén a Buildmap később
-            egyszeri kalkulátorból projektmenedzsment és marketplace platformmá bővíthető.
-          </p>
-        </div>
-
-        {/* ── 4 platform pillars ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-          {PLATFORM_PILLARS.map(p => (
-            <PillarCard key={p.title} pillar={p} />
-          ))}
-        </div>
-
-        {/* ── Revenue streams section ── */}
-        <div
-          className="rounded-3xl p-8 mb-10 border"
-          style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-        >
-          <div className="flex items-center gap-2.5 mb-6">
-            <div
-              className="w-7 h-7 rounded-xl flex items-center justify-center text-sm shrink-0"
-              style={{ background: 'linear-gradient(135deg,#1D4ED8,#7C3AED)', color: '#fff' }}
-            >
-              <span className="text-[11px] font-bold">₣</span>
-            </div>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>
-                Lehetséges bevételi lábak
-              </p>
-              <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>
-                Egymásra épülő, skálázható modell
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {REVENUE_STREAMS.map((s, i) => (
-              <RevenueCard key={s.title} stream={s} index={i} />
-            ))}
-          </div>
-        </div>
-
-        {/* ── Future workspace vision ── */}
-        <div className="card p-7 mb-8">
-          <div className="flex items-start gap-4 mb-5">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ background: '#EFF6FF' }}>🗂️</div>
-            <div>
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Későbbi projekt workspace</p>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)', color: 'var(--tx-muted)' }}>Vízió</span>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-                A hosszabb távú vízió szerint egy-egy építkezés saját projektfelületet kaphat, ahol a tulajdonos,
-                projektmenedzser vagy generálkivitelező meghívhatja az érintett szakembereket. A szakemberek e-mailes
-                hozzáféréssel csak a saját fázisukat és a kapcsolódó előtte/utána lévő feladatokat látnák, így
-                átláthatóbbá válhat a kivitelezés szervezése.
-              </p>
-            </div>
-          </div>
-          <ul className="flex flex-col gap-2 pl-14">
-            {[
-              'Tulajdonos, projektmenedzser vagy generálkivitelező kezelheti a projektet',
-              'Szakemberek e-mail alapján meghívhatók',
-              'Minden szereplő csak a releváns fázisokat láthatja',
-              'Státuszok és következő lépések követhetők',
-              'Hosszabb távon SaaS + marketplace irányba bővíthető',
-            ].map(item => (
-              <li key={item} className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5" style={{ background: '#3B82F6' }} />
-                <span className="text-xs leading-relaxed" style={{ color: 'var(--tx-secondary)' }}>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* ── Technical roadmap card ── */}
-        <div className="card p-6 mb-6 border-l-4" style={{ borderLeftColor: '#3B82F6' }}>
-          <div className="flex items-center gap-2.5 mb-3">
-            <span className="text-lg">🛠️</span>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--tx-primary)' }}>Következő technikai lépés: valódi lead mentés</p>
-              <p className="text-xs" style={{ color: 'var(--tx-muted)' }}>Roadmap — még nem implementált</p>
-            </div>
-          </div>
-          <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--tx-secondary)' }}>
-            A PDF export élesítéséhez backend vagy serverless funkció, e-mail szolgáltató, adatbázis és adatkezelési oldal szükséges. Ezzel a kalkulátor valódi leadgeneráló eszközzé válhat.
-          </p>
-          <ul className="flex flex-col gap-1.5">
-            {['PDF generálás', 'e-mail küldés', 'lead mentés', 'adatkezelési checkbox és privacy oldal', 'CRM / Google Sheets / Airtable / Supabase integráció'].map(item => (
-              <li key={item} className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--tx-secondary)' }}>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />{item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* ── Early access strip ── */}
-        <div
-          className="rounded-3xl overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #312E81 100%)',
-          }}
-        >
-          {/* Decorative blur */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute w-96 h-96 rounded-full opacity-20"
-            style={{
-              background: 'radial-gradient(circle, #60A5FA 0%, transparent 70%)',
-              filter: 'blur(60px)',
-              top: '-4rem',
-              right: '-4rem',
-            }}
-          />
-
-          <div className="relative px-8 py-10 md:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-
-              {/* Left: copy */}
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-blue-300 bg-white/10 border border-white/20 rounded-full px-3 py-1 mb-4">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                  Érdeklődői adatbázis
-                </span>
-                <h3 className="font-serif text-xl md:text-2xl font-medium text-white mb-3 leading-snug">
-                  Érdeklődői adatbázis építése már az első verziótól
-                </h3>
-                <p className="text-sm text-blue-100 leading-relaxed">
-                  Az értesítést kérek és szakember jelentkezés funkciók később
-                  validációs és értékesítési csatornává alakíthatók.
-                </p>
-              </div>
-
-              {/* Right: CTAs */}
-              <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3">
-                <button
-                  type="button"
-                  onClick={() => openModal('epitkezo')}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-semibold text-white border border-white/25 bg-white/10 backdrop-blur-sm transition-all hover:bg-white/20 hover:scale-[1.02] active:scale-[.98]"
-                >
-                  🏠 Építkező vagyok
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openModal('kivitelező')}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 text-sm font-semibold border border-white/25 bg-white/10 backdrop-blur-sm transition-all hover:bg-white/20 hover:scale-[1.02] active:scale-[.98]"
-                  style={{ color: '#fff' }}
-                >
-                  👷 Szakember vagyok
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      {/* Modal */}
-      {modalOpen && (
-        <EarlyAccessModal
-          initialRole={initRole}
-          onClose={() => setModalOpen(false)}
-        />
-      )}
-    </>
-  )
-}
-
-// ── Sub-components ─────────────────────────────────────────────────────────
-
-function PillarCard({ pillar }: {
-  key?: string
-  pillar: (typeof PLATFORM_PILLARS)[0]
-}) {
-  return (
-    <div
-      className="card p-6 flex gap-5 items-start transition-all hover:scale-[1.01]"
-    >
-      {/* Icon */}
-      <div
-        className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
-        style={{ background: pillar.bg }}
-      >
-        {pillar.icon}
-      </div>
-
-      {/* Text */}
-      <div className="min-w-0">
-        <p className="text-sm font-semibold mb-1.5 leading-snug" style={{ color: 'var(--tx-primary)' }}>
-          {pillar.title}
-        </p>
-        <p className="text-xs leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-          {pillar.text}
-        </p>
-      </div>
-
-      {/* Right accent dot */}
-      <div
-        className="w-2 h-2 rounded-full mt-1 shrink-0"
-        style={{ background: pillar.color, opacity: 0.5 }}
-      />
+    <div className="mb-7">
+      <p className="text-[10px] font-bold uppercase tracking-[.14em] mb-2" style={{ color: 'var(--sage)' }}>{label}</p>
+      <h2 className="font-serif text-xl md:text-2xl font-medium mb-2 leading-snug" style={{ color: 'var(--tx-primary)' }}>{title}</h2>
+      {subtitle && <p className="text-sm leading-relaxed max-w-xl" style={{ color: 'var(--tx-muted)' }}>{subtitle}</p>}
     </div>
   )
 }
 
-function RevenueCard({ stream, index }: {
-  key?: string
-  stream: (typeof REVENUE_STREAMS)[0]
-  index: number
-}) {
-  // Subtle gradient strip at top keyed to index
-  const accents = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B']
-  const accent  = accents[index % accents.length]
+function Grid({ children, cols = 3 }: { children: React.ReactNode; cols?: 2 | 3 | 4 }) {
+  const cls = cols === 2 ? 'grid-cols-1 sm:grid-cols-2'
+    : cols === 4 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+  return <div className={`grid ${cls} gap-4`}>{children}</div>
+}
 
+function Card({ icon, title, text }: { key?: string; icon: string; title: string; text: string }) {
   return (
-    <div
-      className="rounded-2xl p-4 border relative overflow-hidden transition-all hover:scale-[1.02]"
-      style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}
-    >
-      {/* Top accent line */}
-      <div
-        className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl"
-        style={{ background: `linear-gradient(90deg, ${accent} 0%, transparent 100%)` }}
-      />
-      <div className="text-xl mb-3 mt-1">{stream.icon}</div>
-      <p className="text-xs font-semibold mb-1.5" style={{ color: 'var(--tx-primary)' }}>{stream.title}</p>
-      <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>{stream.text}</p>
+    <div className="card p-5 flex flex-col gap-2.5">
+      <div className="flex items-center gap-2.5">
+        <span className="text-lg">{icon}</span>
+        <p className="text-xs font-semibold" style={{ color: 'var(--tx-primary)' }}>{title}</p>
+      </div>
+      <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>{text}</p>
+    </div>
+  )
+}
+
+function Divider() {
+  return (
+    <div className="flex items-center gap-3 my-12">
+      <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--sage)' }} />
+      <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+    </div>
+  )
+}
+
+// ── Main export ───────────────────────────────────────────────────────────
+
+import React from 'react'
+
+export default function StrategicSection() {
+  return (
+    <div className="animate-fade-up page-top pb-16">
+
+      {/* ── Hero ── */}
+      <div className="text-center max-w-2xl mx-auto mb-14 px-2">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase rounded-full px-3.5 py-1.5 mb-5 border"
+          style={{ color: 'var(--sage)', background: 'var(--sage-light)', borderColor: 'var(--sage-border)' }}>
+          🚀 Befektetői vízió
+        </span>
+        <h1 className="font-serif text-3xl md:text-4xl font-medium mb-4 leading-tight" style={{ color: 'var(--tx-primary)' }}>
+          Buildmap befektetői vízió
+        </h1>
+        <p className="text-base leading-relaxed mb-3 font-medium" style={{ color: 'var(--tx-secondary)' }}>
+          Nem csak építkezési kalkulátor, hanem fiókalapú projektplatform civil építkezőknek.
+        </p>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+          A Buildmap célja, hogy az építkezők és felújítók egy helyen lássák az időt, költséget,
+          szakembereket, anyagokat és következő lépéseket.
+        </p>
+      </div>
+
+      {/* ── Demo disclaimer ── */}
+      <div className="rounded-2xl px-5 py-4 mb-12 border flex items-start gap-3 max-w-2xl mx-auto"
+        style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
+        <span className="text-base shrink-0 mt-px">ℹ️</span>
+        <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
+          Ez a felület jelenleg befektetői/MVP demó. A backend, valódi fiókkezelés, partneri
+          ajánlatok és fizetés későbbi fejlesztési lépések.
+        </p>
+      </div>
+
+      {/* ── 1. Mi működik már ── */}
+      <section className="mb-4">
+        <SectionHeader
+          label="01 — Jelenlegi állapot"
+          title="Mi működik már a demóban?"
+          subtitle="Az MVP már tartalmaz minden kulcsfunkciót a befektetői prezentációhoz."
+        />
+        <Grid cols={3}>
+          {MVP_CARDS.map(c => <Card key={c.title} {...c} />)}
+        </Grid>
+      </section>
+
+      <Divider />
+
+      {/* ── 2. Platform expansion ── */}
+      <section className="mb-4">
+        <SectionHeader
+          label="02 — Skálázás"
+          title="Hogyan lesz ebből platform?"
+          subtitle="A projektdata az ingyenes kalkulátortól a fiókalapú projektmenedzsmentig vezet."
+        />
+        <Grid cols={3}>
+          {PLATFORM_CARDS.map(c => <Card key={c.title} {...c} />)}
+        </Grid>
+      </section>
+
+      <Divider />
+
+      {/* ── 3. Revenue ── */}
+      <section className="mb-4">
+        <SectionHeader
+          label="03 — Üzleti modell"
+          title="Lehetséges bevételi lábak"
+          subtitle="Több párhuzamos bevételi vonal, amelyek a projektalapú adatokra építenek."
+        />
+        <Grid cols={3}>
+          {REVENUE_CARDS.map(c => <Card key={c.title} {...c} />)}
+        </Grid>
+
+        {/* Funnel */}
+        <div className="mt-6 rounded-2xl p-5 border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <p className="text-[10px] font-bold uppercase tracking-widest mb-4 text-center" style={{ color: 'var(--tx-muted)' }}>
+            Platform értéklánc
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-0">
+            {['Forgalom', 'Kalkulátor', 'PDF lead', 'Projektadat', 'Ajánlatkérés', 'Partnerbevétel'].map((step, i, arr) => (
+              <React.Fragment key={step}>
+                <div className="flex flex-col items-center px-2 py-1">
+                  <span className="text-xs font-semibold" style={{ color: 'var(--sage)' }}>{step}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+                    <path d="M1 5h12M10 1l4 4-4 4" stroke="var(--border-strong)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* ── 4. Roadmap ── */}
+      <section className="mb-4">
+        <SectionHeader
+          label="04 — Roadmap"
+          title="Következő 90 nap"
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {ROADMAP.map((item, i) => (
+            <div key={item.label} className="card p-4 flex items-start gap-3">
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center text-[11px] font-bold shrink-0 text-white"
+                style={{ background: 'var(--sage)', opacity: 0.7 + i * 0.05 }}>
+                {i + 1}
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: 'var(--tx-muted)' }}>{item.label}</p>
+                <p className="text-xs font-medium" style={{ color: 'var(--tx-primary)' }}>{item.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* ── 5. Funding use ── */}
+      <section>
+        <SectionHeader
+          label="05 — Következő forrás"
+          title="Mire kell a következő forrás?"
+          subtitle="Az első befektetés a termék és az első fizető felhasználók megszerzésére irányul."
+        />
+        <Grid cols={3}>
+          {FUNDING_CARDS.map(c => <Card key={c.title} {...c} />)}
+        </Grid>
+      </section>
+
     </div>
   )
 }

@@ -62,15 +62,34 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
     <div className="animate-fade-up">
       {/* Hero */}
       <div className="page-top pb-6 text-center max-w-2xl mx-auto px-4">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase text-blue-600 bg-blue-50 dark:bg-blue-950/60 dark:text-blue-400 border border-blue-100 dark:border-blue-900/60 rounded-full px-3.5 py-1.5 mb-5">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase rounded-full px-3.5 py-1.5 mb-5 border"
+          style={{ color: 'var(--sage)', background: 'var(--sage-light)', borderColor: 'var(--sage-border)' }}>
           👷 Szakemberkereső — hamarosan
         </span>
         <h2 className="font-serif text-2xl md:text-3xl font-medium mb-3 leading-snug" style={{ color: 'var(--tx-primary)' }}>
           Validált szakemberek építkezéshez
         </h2>
-        <p className="text-sm leading-relaxed max-w-lg mx-auto" style={{ color: 'var(--tx-muted)' }}>
-          Hamarosan olyan szakembereket, kivitelezőket és szolgáltatókat találhatsz itt, akik előzetes ellenőrzés után kerülnek fel a felületre.
+        <p className="text-sm leading-relaxed max-w-lg mx-auto mb-3" style={{ color: 'var(--tx-muted)' }}>
+          Az éles verzióban a szakemberek nem egyszerű hirdetési listaként jelennek meg, hanem
+          projekttípus, fázis, lokáció és validáció alapján kapcsolódhatnak az építkezéshez.
         </p>
+      </div>
+
+      {/* ── Validation logic block ── */}
+      <div className="card p-6 mb-6">
+        <p className="text-sm font-semibold mb-1" style={{ color: 'var(--tx-primary)' }}>Validációs szempontok</p>
+        <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--tx-muted)' }}>
+          A Buildmap nem JóSzaki-klón — a cél projekttípus- és fázisalapú, előszűrt szakemberhálózat.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {['Végzettség / jogosultság', 'Referencia', 'Lokáció', 'Elérhetőség', 'Fázishoz illeszkedés', 'Ügyfélértékelések'].map(tag => (
+            <span key={tag}
+              className="text-[11px] font-medium rounded-xl px-3 py-1.5 border"
+              style={{ background: 'var(--sage-light)', borderColor: 'var(--sage-border)', color: 'var(--sage)' }}>
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
 
       {/* ── Filter section ── */}
@@ -202,7 +221,7 @@ export default function Szakemberek({ initialCategory, onCategoryConsumed }: Pro
       {/* Disclaimer */}
       <div className="rounded-2xl p-4 border mb-8" style={{ background: 'var(--surface-subtle)', borderColor: 'var(--border)' }}>
         <p className="text-[11px] leading-relaxed" style={{ color: 'var(--tx-muted)' }}>
-          ℹ️ A profilok fiktív demó adatok, nem valós szakemberajánlások. Az éles rendszer célja előszűrt, validált szakemberek listázása lesz referenciák, jogosultságok és működési terület alapján.
+          ℹ️ A profilok fiktív demó adatok, nem valós szakemberajánlások. Az éles rendszer célja előszűrt, validált szakemberek projektalapú kapcsolása lesz — nem hirdetési lista, hanem fázis- és lokációalapú matchmaking.
         </p>
       </div>
 
