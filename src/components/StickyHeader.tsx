@@ -6,6 +6,7 @@ import {
   formToShareUrl, formatSavedAt,
 } from '../utils/storageUtils'
 import { PROJECTS } from '../data/projects'
+import BuildmapLogo from './ui/BuildmapLogo'
 import PdfLeadModal from './PdfLeadModal'
 import AccountModal from './AccountModal'
 
@@ -118,10 +119,8 @@ export default function StickyHeader({ form, result, onLoadProject, activeTab, o
 
           {/* Brand */}
           <button type="button" onClick={() => switchTab('calculator')}
-            className="flex items-center gap-2 group shrink-0">
-            <div className="w-6 h-6 rounded-md flex items-center justify-center text-white font-bold text-xs shadow-sm group-hover:scale-105 transition-transform"
-              style={{ background: 'var(--sage)' }}>B</div>
-            <span className="font-semibold text-sm" style={{ color: 'var(--tx-primary)' }}>Buildmap</span>
+            className="flex items-center group shrink-0">
+            <BuildmapLogo size={24} />
           </button>
 
           {/* Utilities */}

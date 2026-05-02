@@ -95,7 +95,7 @@ export default function PdfLeadModal({ onClose, result, form }: Props) {
     /* Header */
     .doc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid #E4E1DA; }
     .brand { display: flex; align-items: center; gap: 10px; }
-    .brand-mark { width: 32px; height: 32px; background: #4A7C59; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+    .brand-mark { width: 32px; height: 32px; background: #4A7C59; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
     .brand-name { font-size: 20px; font-weight: 700; color: #1C1F1A; letter-spacing: -.3px; }
     .brand-tag { font-size: 11px; color: #4A7C59; font-style: italic; margin-top: 1px; }
     .doc-meta { text-align: right; font-size: 11px; color: #9A9F94; line-height: 1.6; }
@@ -151,7 +151,7 @@ export default function PdfLeadModal({ onClose, result, form }: Props) {
   <!-- Header -->
   <div class="doc-header">
     <div class="brand">
-      <div class="brand-mark">B</div>
+      <div class="brand-mark"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="8" fill="#4A7C59"/><rect x="7" y="19" width="14" height="4" rx="2" fill="#E8F5EC" opacity="0.55"/><rect x="7" y="13" width="11" height="4" rx="2" fill="#E8F5EC" opacity="0.75"/><rect x="7" y="7" width="8" height="4" rx="2" fill="#ffffff"/><rect x="17" y="7" width="2.5" height="10" rx="1.25" fill="#ffffff" opacity="0.85"/><rect x="15" y="13.5" width="4.5" height="2" rx="1" fill="#A8C5B0"/><circle cx="24" cy="9" r="2.5" fill="#7FB3C8"/><circle cx="24" cy="9" r="1.2" fill="#ffffff"/></svg></div>
       <div>
         <div class="brand-name">Buildmap</div>
         <div class="brand-tag">az építkezésed térképe.</div>
